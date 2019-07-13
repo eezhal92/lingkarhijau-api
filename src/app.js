@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 
 import routes from './routes';
-import { UnprocessableEntityError } from './lib/errors';
+import { UnprocessableEntityError, HTTPError } from './lib/errors';
 
 const app = express();
 
@@ -14,8 +14,14 @@ app.use(bodyParser.urlencoded({
 app.use('/api', routes);
 
 app.use((error, request, response, next) => {
-  if (error instanceof UnprocessableEntityError) {
-    return response.status(error.statusCode).json(error.errors);
+  if (error instanceof HTTPError) {
+    if (error instanceof UnprocessableEntityError) {
+      return response.status(error.statusCode).json(error.errors);
+    } else {
+      return response.status(error.statusCode).json({
+        message: error.message,
+      });
+    }
   }
 
   next(error);

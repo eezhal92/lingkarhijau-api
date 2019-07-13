@@ -30,7 +30,7 @@ export async function findByEmailAndPassword(payload) {
 export function createToken(user, secret) {
   if (!secret) throw new Error('Invalid argument. `secret` argument needed');
 
-  const claim = { id: user._id, email: user.email };
+  const claim = { id: user._id, email: user.email, roles: user.roles };
   return jwt.sign(claim, secret, {
     algorithm: 'HS256',
     expiresIn: '1 week'

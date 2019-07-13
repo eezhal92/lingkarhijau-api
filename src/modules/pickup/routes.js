@@ -7,6 +7,17 @@ import * as handlers from './handlers';
 const router = Router();
 
 router.get('/', shouldAuthenticated, handlers.getAll);
+router.patch(
+  '/:id',
+  shouldAuthenticated,
+  createShouldValidated({
+    address: 'required',
+    coordinate: 'required',
+    date: 'required|date',
+    status: 'required|integer|between:1,3' // see PickupStatus
+  }),
+  handlers.update
+);
 router.post(
   '/',
   shouldAuthenticated,

@@ -30,3 +30,27 @@ export function find(payload) {
     }
   });
 }
+
+/**
+ * @param {object} payload
+ * @param {string} payload.pickupId
+ * @param {number} payload.status
+ * @param {string} payload.address
+ * @param {string} payload.coordinate
+ * @param {string} payload.date
+ */
+export function update(payload) {
+  // todo: logic to prevent fraud
+  const { status, address, coordinate, date } = payload;
+
+  return Pickup.findOneAndUpdate(
+    { _id: payload.pickupId },
+    {
+      status,
+      address,
+      coordinate,
+      date
+    },
+    { new: true }
+  );
+}

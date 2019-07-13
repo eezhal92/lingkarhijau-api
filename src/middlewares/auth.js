@@ -19,6 +19,7 @@ export function shouldAuthenticated(request, response, next) {
   }
 
   request.userId = claim.id;
+  request.userRoles = claim.roles;
 
   return next();
 }
