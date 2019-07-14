@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express from 'express';
 import bodyParser from 'body-parser';
 
@@ -6,6 +7,9 @@ import { UnprocessableEntityError, HTTPError } from './lib/errors';
 
 const app = express();
 
+app.use(cors({
+  origin: '*',
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true

@@ -12,6 +12,7 @@
   "dependencies": {
     "bcrypt": "^3.0.6",
     "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
     "dotenv": "^8.0.0",
     "es6-error": "^4.1.1",
     "esm": "^3.2.18",
