@@ -11,14 +11,17 @@ const HASH_SALT = 10;
  * @param {string} payload.password
  */
 export async function findByEmailAndPassword(payload) {
-  const user = await User.findOne({ email: payload.email })
-    .select('id email +password');
+  let user = await User.findOne({ email: payload.email })
+    .select('id email +password roles type phone');
 
   if (!user) return null;
 
   const isPasswordMatch = bcrypt.compareSync(payload.password, user.password);
 
   if (!isPasswordMatch) return null;
+
+  user = user.toJSON();
+  delete user.password;
 
   return user;
 }

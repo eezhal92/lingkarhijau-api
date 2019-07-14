@@ -26,6 +26,7 @@ export async function login(request, response) {
 
   return response.json({
     token,
+    user
   });
 }
 
