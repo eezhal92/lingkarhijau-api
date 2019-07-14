@@ -1,6 +1,7 @@
 import * as httpStatus from 'http-status';
 import * as accountService from './services/account';
 import { AccountNotFound } from './errors';
+import { NotFoundError } from '../../lib/errors';
 
 export async function requestResetPassword (request, response, next) {
   const { email } = request.body;
@@ -48,4 +49,18 @@ export function getResetPasswordRequest(request, response, next) {
     .catch((error) => {
       next(error);
     });
+}
+
+/**
+ * Get current user information
+ * @return {[type]} [description]
+ */
+export function getMe(request, response, next) {
+  accountService.findById(request.userId)
+    .then((user) => {
+      if (!user) return next(new NotFoundError());
+
+      return response.json({ user });
+    })
+    .catch(next);
 }

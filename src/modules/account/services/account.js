@@ -65,3 +65,7 @@ export async function saveNewPassword(payload) {
 
   return true;
 }
+
+export function findById(id) {
+  return User.findById(id);
+}

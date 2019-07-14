@@ -10,9 +10,8 @@ export class HTTPError extends ExtendableError {
 }
 
 export class NotFoundError extends HTTPError {
-  constructor(errors, message = httpStatus.NOT_FOUND) {
+  constructor(message = httpStatus.NOT_FOUND) {
     super(httpStatus['404_MESSAGE'], message);
-    this.errors = errors;
   }
 }
 
