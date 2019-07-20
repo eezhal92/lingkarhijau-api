@@ -1,9 +1,17 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import Hashids from 'hashids';
 import { User } from '../../../db/models';
 import { EmailIsTakenError } from '../errors';
+import * as mail from '../../../lib/mail';
 
 const HASH_SALT = 10;
+
+function createActivationCode (email) {
+  const hashids = new Hashids(email);
+  const number = Number(Math.random().toString().slice(2, 18));
+  return hashids.encode(number);
+}
 
 /**
  * @param {object} payload
@@ -12,7 +20,7 @@ const HASH_SALT = 10;
  */
 export async function findByEmailAndPassword(payload) {
   let user = await User.findOne({ email: payload.email })
-    .select('id email +password roles type phone');
+    .select('id email +password roles type phone activated');
 
   if (!user) return null;
 
@@ -68,5 +76,25 @@ export async function register(payload) {
     password: bcrypt.hashSync(payload.password, HASH_SALT)
   });
 
-  return User.create(data);
+  const activationCode = createActivationCode();
+
+  const user = await User.create({
+    ...data,
+    activationCode,
+  });
+
+  await mail.sendMime({
+    from: 'support@lingkarhijau.net',
+    to: payload.email,
+    subject: 'Selamat Datang di lingkar hijau!',
+    html: `
+      <p>Halo, ${user.name}</p>
+      <p>Selamat datang di Lingkar Hijau. Untuk bisa memulai menggunakan aplikasi, harap untuk mengaktifkan akun anda dengan
+<a href="${process.env.FRONTEND_URL}/aktivasi?code=${activationCode}">klik link ini</a>.</p>
+      <br>
+      <p>Tim Lingkar Hijau</p>
+    `
+  });
+
+  return user;
 }

@@ -53,7 +53,6 @@ export function getResetPasswordRequest(request, response, next) {
 
 /**
  * Get current user information
- * @return {[type]} [description]
  */
 export function getMe(request, response, next) {
   accountService.findById(request.userId)
@@ -63,4 +62,20 @@ export function getMe(request, response, next) {
       return response.json({ user });
     })
     .catch(next);
+}
+
+export async function activate(request, response, next) {
+  const code = request.body.code || 'invalid-code';
+
+  try {
+    await accountService.activate(code);
+  } catch (error) {
+    if (error instanceof AccountNotFound) {
+      return next(new NotFoundError(error.message));
+    }
+  }
+
+  return response.json({
+    message: 'Akun anda berhasil di aktivasi',
+  });
 }

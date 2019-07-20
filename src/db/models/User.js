@@ -5,12 +5,11 @@ const UserSchema = Schema({
   email: { type: String, required: true, index: true },
   phone: { type: String, required: true },
   type: { type: String, required: true },
-  resetPasswordCode: {
-    type: String, default: null, select: false
-  },
   password: {
     type: String, required: true, default: '', select: false
   },
+  activationCode: { type: String, default: null },
+  activated: { type: Boolean, default: false },
   roles: { type: Array, default: [] }
 });
 

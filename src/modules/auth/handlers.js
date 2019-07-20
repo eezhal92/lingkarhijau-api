@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import { EmailIsTakenError } from './errors';
 import * as authService from './services/auth';
 import { Roles } from '../../lib/rbac/constants';
+import { UnprocessableEntityError } from '../../lib/errors';
 
 /**
  * @param {import("express").Request} request
@@ -16,7 +17,7 @@ export async function login(request, response) {
     password,
   });
 
-  if (!user) {
+  if (!user || !user.activated) {
     return response.status(httpStatus.NOT_FOUND).json({
       message: 'No such account',
     });
@@ -51,12 +52,14 @@ export async function register(request, response, next) {
       name,
       phone,
       type: Roles.MEMBER,
-    })
+    });
   } catch (error) {
     if (error instanceof EmailIsTakenError) {
-      return response.status(400).json({
-        message: error.message,
-      })
+      return next(new UnprocessableEntityError({
+        errors: {
+          email: ['email ini telah digunakan oleh akun lain']
+        }
+      }));
     }
 
     return next(error);

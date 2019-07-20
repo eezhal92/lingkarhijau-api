@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import Hashids from 'hashids';
 
 import * as mail from '../../../lib/mail';
-import { User } from '../../../db/models';
+import { User, ResetPassword } from '../../../db/models';
 import { AccountNotFound } from '../errors';
 
 const HASH_SALT = 10;
@@ -23,9 +23,11 @@ export async function requestResetPassword (email) {
 
   const code = createResetCode(user);
 
-  user.resetPasswordCode = code;
-
-  await user.save()
+  await ResetPassword.create({
+    user: user._id,
+    code,
+    email,
+  });
 
   return mail.sendMime({
     from: 'support@lingkarhijau.net',
@@ -34,7 +36,7 @@ export async function requestResetPassword (email) {
     html: `
       <p>Halo, ${user.name}</p>
       <p>Kami menerima permintaan ubah password untuk akun yang terhubung dengan email Anda.
-<a href="${process.env.FRONTEND_URL}/ubah-password?code=${code}">Klik link ini</a> untuk membuat password baru</a>. Jika ini bukan dari Anda, cukup abaikan email ini.</p>
+<a href="${process.env.FRONTEND_URL}/konfirmasi-ubah-password?code=${code}">Klik link ini</a> untuk membuat password baru</a>. Jika ini bukan dari Anda, cukup abaikan email ini.</p>
       <br>
       <p>Tim Lingkar Hijau</p>
     `
@@ -44,7 +46,13 @@ export async function requestResetPassword (email) {
 export function findUserByResetCode(code) {
   if (!code) return Promise.reject(new Error('No user with password request found'));
 
-  return User.findOne({ resetPasswordCode: code });
+  return ResetPassword.findOne({ code })
+    .populate('user')
+    .then((data) => {
+      if (!data) return null;
+
+      return data.user;
+    });
 }
 
 /**
@@ -68,4 +76,27 @@ export async function saveNewPassword(payload) {
 
 export function findById(id) {
   return User.findById(id);
+}
+
+export async function activate(code) {
+  const user = await User.findOne({ activationCode: code });
+
+  if (!user) throw new AccountNotFound('Kode aktivasi tidak valid.');
+
+  user.activationCode = null;
+  user.activated = true;
+  await user.save();
+  await mail.sendMime({
+    from: 'support@lingkarhijau.net',
+    to: user.email,
+    subject: 'Akun Lingkar Hijau Anda telah aktif!',
+    html: `
+      <p>Halo, ${user.name}</p>
+      <p>Akun anda telah aktif! silakan login di melalui <a href="${process.env.FRONTEND_URL}/login">link ini</a></p>
+      <br>
+      <p>Tim Lingkar Hijau</p>
+    `
+  });
+
+  return user;
 }
