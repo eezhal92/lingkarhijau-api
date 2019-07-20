@@ -66,10 +66,12 @@ export async function saveNewPassword(payload) {
 
   if (!payload.code || !isCodeValid) throw new Error('Reset password code is not valid');
 
-  user.resetPasswordCode = null;
   user.password = bcrypt.hashSync(payload.password, HASH_SALT);
 
   await user.save();
+  await ResetPassword.remove({
+    user: user._id,
+  });
 
   return true;
 }
