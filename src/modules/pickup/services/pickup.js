@@ -20,6 +20,7 @@ export function find(payload) {
   const query = {};
 
   if (payload.userId) query.user = payload.userId;
+  if (payload.status) query.status = payload.status;
 
   return Pickup.paginate(query, {
     page,
@@ -27,7 +28,8 @@ export function find(payload) {
     customLabels: {
       docs: 'items',
       totalDocs: 'total'
-    }
+    },
+    sort: { createdAt: -1 }
   });
 }
 

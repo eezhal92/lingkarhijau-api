@@ -10,6 +10,7 @@ const PickupSchema = Schema({
   address: { type: String, required: true },
   coordinate: { type: String, required: true },
   date: { type: String, required: true },
+  note: String,
   createdAt: { type: Date, default: Date.now },
   status: { type: Number, default: PickupStatus.PLACED },
   updatedAt: { type: Date, default: Date.now },

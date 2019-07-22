@@ -29,6 +29,9 @@ export async function saveNewPassword(request, response, next) {
   try {
     await accountService.saveNewPassword({ password, code });
   } catch (error) {
+    if (error instanceof AccountNotFound) {
+      return next(new NotFoundError('Kode ubah password tidak valid.'));
+    }
     return next(error);
   }
 

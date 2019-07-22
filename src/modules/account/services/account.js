@@ -44,7 +44,7 @@ export async function requestResetPassword (email) {
 }
 
 export function findUserByResetCode(code) {
-  if (!code) return Promise.reject(new Error('No user with password request found'));
+  if (!code) return Promise.reject(new AccountNotFound('No user with password request found'));
 
   return ResetPassword.findOne({ code })
     .populate('user')
@@ -64,7 +64,7 @@ export async function saveNewPassword(payload) {
   const user = await findUserByResetCode(payload.code)
   const isCodeValid = Boolean(user);
 
-  if (!payload.code || !isCodeValid) throw new Error('Reset password code is not valid');
+  if (!payload.code || !isCodeValid) throw new AccountNotFound('Reset password code is not valid');
 
   user.password = bcrypt.hashSync(payload.password, HASH_SALT);
 

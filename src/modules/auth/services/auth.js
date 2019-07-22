@@ -20,7 +20,7 @@ function createActivationCode (email) {
  */
 export async function findByEmailAndPassword(payload) {
   let user = await User.findOne({ email: payload.email })
-    .select('id email +password roles type phone activated');
+    .select('id name email +password roles type phone activated');
 
   if (!user) return null;
 

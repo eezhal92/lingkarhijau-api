@@ -5,7 +5,8 @@ export async function getAll(request, response) {
   const result = await pickupService.find({
     page: Number(request.query.page || 1),
     limit: Number(request.query.limit|| 20),
-  })
+    status: request.query.status,
+  });
 
   response.json(result);
 }
@@ -14,6 +15,7 @@ export async function create(request, response, next) {
   const userId = request.userId;
   const {
     date,
+    note = '',
     address,
     coordinate,
   } = request.body;
@@ -24,6 +26,7 @@ export async function create(request, response, next) {
     pickup = await pickupService.create({
       userId,
       date,
+      note,
       address,
       coordinate,
     });
