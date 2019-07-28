@@ -17,6 +17,7 @@ export async function create(request, response, next) {
     date,
     note = '',
     address,
+    type,
     coordinate,
   } = request.body;
 
@@ -27,6 +28,7 @@ export async function create(request, response, next) {
       userId,
       date,
       note,
+      type,
       address,
       coordinate,
     });
@@ -45,6 +47,7 @@ export async function update(request, response, next) {
     address,
     coordinate,
     status,
+    type,
   } = request.body;
 
   let pickup = null;
@@ -52,6 +55,7 @@ export async function update(request, response, next) {
   try {
     pickup = await pickupService.update({
       pickupId: request.params.id,
+      type,
       status,
       date,
       address,

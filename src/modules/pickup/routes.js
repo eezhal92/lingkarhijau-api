@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { getPickupTypes } from '../../lib/pickup';
 import { shouldAuthenticated } from '../../middlewares/auth';
 import { createShouldValidated } from '../../middlewares/input-validation';
 
@@ -11,6 +12,7 @@ router.patch(
   '/:id',
   shouldAuthenticated,
   createShouldValidated({
+    type: 'required|in:' + getPickupTypes(),
     address: 'required',
     coordinate: 'required',
     date: 'required|date',
@@ -22,6 +24,7 @@ router.post(
   '/',
   shouldAuthenticated,
   createShouldValidated({
+    type: 'required|in:' + getPickupTypes(),
     address: 'required',
     coordinate: 'required',
     date: 'required|date',

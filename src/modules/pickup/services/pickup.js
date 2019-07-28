@@ -6,6 +6,7 @@ import { Pickup } from '../../../db/models';
  * @param {string} payload.date
  * @param {string} payload.userId
  * @param {string} payload.address
+ * @param {string} payload.type
  * @param {string} payload.coordinate
  */
 export function create(payload) {
@@ -38,16 +39,18 @@ export function find(payload) {
  * @param {string} payload.pickupId
  * @param {number} payload.status
  * @param {string} payload.address
+ * @param {string} payload.type
  * @param {string} payload.coordinate
  * @param {string} payload.date
  */
 export function update(payload) {
   // todo: logic to prevent fraud
-  const { status, address, coordinate, date } = payload;
+  const { status, type, address, coordinate, date } = payload;
 
   return Pickup.findOneAndUpdate(
     { _id: payload.pickupId },
     {
+      type,
       status,
       address,
       coordinate,
