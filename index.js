@@ -1,14 +1,6 @@
 require('dotenv').config();
 
-import app from './src/server';
-import * as db from './src/db';
+import container from './src/container';
+const app = container.resolve('app');
 
-const port = process.env.PORT || 3000;
-
-Promise.resolve()
-  .then(db.connect)
-  .then(() => {
-    app.listen(port, () => {
-      console.log(`Listening on port: ${port}`);
-    });
-  });
+app.start();
