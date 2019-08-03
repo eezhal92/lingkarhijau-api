@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-import app from './src/app';
+import app from './src/server';
 import * as db from './src/db';
 
 const port = process.env.PORT || 3000;
