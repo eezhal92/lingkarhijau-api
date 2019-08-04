@@ -1,4 +1,5 @@
 import es from 'eventstore';
+import bluebird from 'bluebird';
 
 function createEventStore({ bus }) {
   // todo: update the config

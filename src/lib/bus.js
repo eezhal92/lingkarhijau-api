@@ -1,3 +1,5 @@
+import bluebird from 'bluebird';
+
 class Bus {
   constructor() {
     this.routes = new Map();
@@ -21,13 +23,18 @@ class Bus {
     }
   }
 
+  /**
+   * @param {object} event
+   */
   publish(event) {
     const eventClassName = event.constructor.name
 
     if (!this.routes.has(eventClassName)) return;
 
-    this.routes.get(eventClassName).forEach((eventHandler) => {
-      eventHandler(event);
+    const handlers = this.routes.get(eventClassName)
+
+    bluebird.each(handlers, async (eventHandler) => {
+      return eventHandler(event);
     });
   }
 }

@@ -1,8 +1,4 @@
-class DomainEvent {
-  constructor() {
-    this.name = this.constructor.name;
-  }
-}
+import { DomainEvent } from '../../lib/domain/event';
 
 export class TrashPricingCreatedEvent extends DomainEvent {
   constructor({ id, name, price, type, unit, actor, description } = {}) {

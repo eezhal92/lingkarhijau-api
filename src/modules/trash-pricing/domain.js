@@ -1,10 +1,3 @@
-import {
-  TrashPricingCreatedEvent,
-  TrashPricingUpdatedEvent,
-  TrashPricingArchivedEvent,
-  TrashPricingUnarchivedEvent,
-} from './event';
-
 export class TrashPricing {
   constructor({
     id,
@@ -115,6 +108,8 @@ export class TrashPricing {
       type: this.type,
       name: this.name,
       price: this.price,
+      unit: this.unit,
+      archived: this.archived,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     }

@@ -7,6 +7,9 @@ import es from './es';
 
 import registerHandlers from './handlers-registration';
 import TrashPricingReadModel from './db/models/TrashPricing';
+import TransactionReadModel from './db/models/Transaction';
+import UserBalanceReadModel from './db/models/UserBalance';
+import { registerServices as registerTransactionServices } from './modules/transaction/hooks';
 import { registerServices as registerTrashPricingServices } from './modules/trash-pricing/hooks';
 
 const container = awilix.createContainer({
@@ -22,8 +25,11 @@ container.register({
   registerHandlers: awilix.asFunction(registerHandlers),
 
   TrashPricingReadModel: awilix.asValue(TrashPricingReadModel),
+  TransactionReadModel: awilix.asValue(TransactionReadModel),
+  UserBalanceReadModel: awilix.asValue(UserBalanceReadModel),
 });
 
 registerTrashPricingServices(container);
+registerTransactionServices(container);
 
 export default container;
