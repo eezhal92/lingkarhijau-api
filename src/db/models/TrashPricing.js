@@ -5,6 +5,7 @@ const TrashPricingSchema = Schema({
   type: { type: String, enum: getValidTrashTypes(), required: true },
   name: { type: String, required: true },
   price: { type: Number, required: true },
+  unit: { type: String, enum: ['kg'] },
   description: { type: String, default: '' },
   archived: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },

@@ -12,6 +12,7 @@ export class TrashPricing {
     name,
     archived = false,
     price,
+    unit,
     createdAt,
     updatedAt,
   } = {}) {
@@ -21,6 +22,7 @@ export class TrashPricing {
     this.name = name;
     this.archived = archived;
     this.price = price;
+    this.unit = unit;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
 
@@ -51,6 +53,7 @@ export class TrashPricing {
     this.id = data.id;
     this.type = data.type;
     this.name = data.name;
+    this.unit = data.unit;
     this.archived = data.archived;
     this.price = data.price;
     this.createdAt = data.createdAt;
@@ -91,6 +94,7 @@ export class TrashPricing {
     this.type = data.type;
     this.name = data.name;
     this.price = data.price;
+    this.unit = data.unit;
     this.description = data.description;
     this.createdAt = data.createdAt;
     this.updatedAt = data.updatedAt;
@@ -100,6 +104,7 @@ export class TrashPricing {
     this.type = data.type;
     this.name = data.name;
     this.price = data.price;
+    this.unit = data.unit;
     this.description = data.description;
     this.updatedAt = data.updatedAt;
   }

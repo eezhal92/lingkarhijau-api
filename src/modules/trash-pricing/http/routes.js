@@ -27,15 +27,19 @@ export function createRoute({ bus, TrashPricingReadModel }) {
     shouldAuthenticated,
     createShouldValidated({
       name: 'required',
+      unit: 'required|in:kg',
       price: 'required|numeric|min:1',
       type: `required|in:${getValidTrashTypes()}`,
     }),
     function (request, response) {
-      const { name, price, type, description = '' } = request.body;
+      const { userId } = request;
+      const { name, price, type, unit, description = '' } = request.body;
 
       bus.send(new CreateTrashPricingCommand({
+        actor: userId,
         name,
         price,
+        unit,
         type,
         description,
       }));
@@ -51,18 +55,22 @@ export function createRoute({ bus, TrashPricingReadModel }) {
     shouldAuthenticated,
     createShouldValidated({
       name: 'required',
+      unit: 'required|in:kg',
       price: 'required|numeric|min:1',
       type: `required|in:${getValidTrashTypes()}`,
     }),
     function (request, response) {
-      const { name, price, type, description = '' } = request.body;
+      const { userId } = request;
+      const { name, price, type, unit, description = '' } = request.body;
       const { id } = request.params;
 
       bus.send(new UpdateTrashPricingCommand({
+        actor: userId,
         id,
         name,
         price,
         type,
+        unit,
         description,
       }));
 

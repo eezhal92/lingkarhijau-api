@@ -19,7 +19,9 @@ export class CreateTrashPricingCommandHandler {
 
     trashPricing.apply(new TrashPricingCreatedEvent({
       id: mongoose.Types.ObjectId().toString(),
+      actor: command.data.actor,
       name: command.data.name,
+      unit: command.data.unit,
       type: command.data.type,
       price: command.data.price,
       description: command.data.description || '',
@@ -47,7 +49,9 @@ export class UpdateTrashPricingCommandHandler {
     }
 
     trashPricing.apply(new TrashPricingUpdatedEvent({
+      actor: command.data.actor,
       id: command.data.id,
+      unit: command.data.unit,
       name: command.data.name,
       price: command.data.price,
       type: command.data.type,
