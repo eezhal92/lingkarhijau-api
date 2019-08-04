@@ -1,5 +1,3 @@
-import { UserBalanceAddedEvent, UserBalanceReducedEvent } from './domain/event';
-
 export class UserBalanceView {
   constructor(UserBalanceModel) {
     this.userBalanceModel = UserBalanceModel;
@@ -13,13 +11,23 @@ export class UserBalanceView {
    */
   async handle(event) {
     let userBalance = await this.userBalanceModel.findOne({ user: event.data.user });
+    console.log('UserBalanceView projection start:', {
+      event: event.name,
+      amount: event.data.amount,
+    });
 
-    if (event instanceof UserBalanceAddedEvent) {
+    console.log('Before Balance:', userBalance.balance);
+
+    if (event.name ===  'UserBalanceAddedEvent') {
       userBalance.balance += event.data.amount;
-    } else if (event instanceof UserBalanceReducedEvent) {
+    } else if (event.name === 'UserBalanceReducedEvent') {
       userBalance.balance -= event.data.amount;
     }
 
-    return userBalance.save();
+    return userBalance.save()
+      .then((data) => {
+        console.log('UserBalanceView projection finished!');
+        console.log('After Balance:', data.balance);
+      });
   }
 }

@@ -4,6 +4,7 @@ import server from './server';
 import routes from './routes';
 import Bus from './lib/bus';
 import es from './es';
+import { UserBalanceQueue } from './lib/queue';
 
 import registerHandlers from './handlers-registration';
 import TrashPricingReadModel from './db/models/TrashPricing';
@@ -24,6 +25,7 @@ container.register({
   routes: awilix.asFunction(routes).singleton(),
   registerHandlers: awilix.asFunction(registerHandlers),
 
+  userBalanceQueue: awilix.asClass(UserBalanceQueue).singleton(),
   TrashPricingReadModel: awilix.asValue(TrashPricingReadModel),
   TransactionReadModel: awilix.asValue(TransactionReadModel),
   UserBalanceReadModel: awilix.asValue(UserBalanceReadModel),

@@ -4,11 +4,17 @@ import { TransactionTypes } from '../../../lib/transaction';
  * @param {object}      payload
  * @param {string}      payload.user
  * @param {string}      payload.type
+ * @param {number}      payload.amount
  * @param {string?}     payload.pickup
  * @param {Array<any>?} payload.items
  */
 export function createTransaction(payload) {
-  const totalAmount = getItemsTotalAmount(payload.items);
+  let totalAmount = payload.amount;
+
+  if (payload.type !== TransactionTypes.REDEEM) {
+    totalAmount = getItemsTotalAmount(payload.items);
+  }
+
   const meta = getTransactionMeta({
     ...payload,
     amount: totalAmount,

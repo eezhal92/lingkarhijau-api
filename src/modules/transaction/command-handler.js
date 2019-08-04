@@ -57,7 +57,7 @@ export class CreateTransactionCommandHandler {
       transaction: donationTrx.toObject(),
     }), true);
 
-    this.userBalanceESRepo.save(userBalance);
+    return this.userBalanceESRepo.save(userBalance);
   }
 
   /**
@@ -76,7 +76,7 @@ export class CreateTransactionCommandHandler {
       transaction: trx.toObject(),
     }), true);
 
-    this.userBalanceESRepo.save(userBalance);
+    return this.userBalanceESRepo.save(userBalance);
   }
 
   /**
@@ -95,7 +95,7 @@ export class CreateTransactionCommandHandler {
       transaction: trx.toObject(),
     }), true);
 
-    this.userBalanceESRepo.save(userBalance);
+    return this.userBalanceESRepo.save(userBalance);
   }
 
   /**
@@ -111,13 +111,13 @@ export class CreateTransactionCommandHandler {
       throw new Error(`User balance is not enough: ${userBalance.balance} < ${command.data.amount}`);
     }
 
-    userBalance.apply(new UserReducedAddedEvent({
+    userBalance.apply(new UserBalanceReducedEvent({
       actor: command.data.actor,
       user: command.data.user,
       amount: command.data.amount,
       transaction: trx.toObject(),
     }), true);
 
-    this.userBalanceESRepo.save(userBalance);
+    return this.userBalanceESRepo.save(userBalance);
   }
 }

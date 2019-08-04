@@ -1,5 +1,10 @@
 # lingkarhijau-api
 
+## Requirements
+- NodeJS 8.9+
+- Redis
+- MongoDB
+
 ## Todo
 [ ] Unit, integration testing!
 [ ] Logging

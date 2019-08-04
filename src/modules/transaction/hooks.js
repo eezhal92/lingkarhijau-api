@@ -23,11 +23,14 @@ export function registerServices(container) {
  */
 export function registerHandlers({
   bus,
+  userBalanceQueue,
   userBalanceESRepo,
   TransactionReadModel,
   UserBalanceReadModel,
 }) {
+  userBalanceQueue.register(new UserBalanceView(UserBalanceReadModel).handle);
+
   bus.registerHandler(CreateTransactionCommand, new CreateTransactionCommandHandler(TransactionReadModel, userBalanceESRepo).handle);
-  bus.registerHandler(UserBalanceAddedEvent, new UserBalanceView(UserBalanceReadModel).handle);
-  bus.registerHandler(UserBalanceReducedEvent, new UserBalanceView(UserBalanceReadModel).handle);
+  bus.registerHandler(UserBalanceAddedEvent, userBalanceQueue.push);
+  bus.registerHandler(UserBalanceReducedEvent, userBalanceQueue.push);
 }
