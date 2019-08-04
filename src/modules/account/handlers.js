@@ -58,7 +58,7 @@ export function getResetPasswordRequest(request, response, next) {
  * Get current user information
  */
 export function getMe(request, response, next) {
-  accountService.findById(request.userId)
+  accountService.getMe(request.userId)
     .then((user) => {
       if (!user) return next(new NotFoundError());
 
@@ -81,4 +81,15 @@ export async function activate(request, response, next) {
   return response.json({
     message: 'Akun anda berhasil di aktivasi',
   });
+}
+
+export function getTransactions(request, response) {
+  return accountService.getTransactions({
+    user: request.userId,
+    limit: Number(request.query.limit) || 20,
+    page: Number(request.query.page) || 1,
+  })
+    .then((data) => {
+      response.json(data);
+    });
 }

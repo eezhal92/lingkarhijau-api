@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import Hashids from 'hashids';
 
 import * as mail from '../../../lib/mail';
-import { User, ResetPassword } from '../../../db/models';
+import { User, UserBalance, ResetPassword, Transaction } from '../../../db/models';
 import { AccountNotFound } from '../errors';
 
 const HASH_SALT = 10;
@@ -76,6 +76,23 @@ export async function saveNewPassword(payload) {
   return true;
 }
 
+export function getMe(id) {
+  return Promise.all([
+    UserBalance.findOne({ user: id }),
+    User.findById(id),
+  ])
+    .then(([userBalance, user]) => {
+      let balance = 0;
+      if (userBalance) {
+        balance = userBalance.balance;
+      }
+
+      return Object.assign(user.toObject(), {
+        balance,
+      });
+    })
+}
+
 export function findById(id) {
   return User.findById(id);
 }
@@ -101,4 +118,25 @@ export async function activate(code) {
   });
 
   return user;
+}
+
+/**
+ * @param {object} options
+ * @param {number} options.page
+ * @param {number} options.limit
+ * @param {string} options.user
+ */
+export function getTransactions (options) {
+  const { limit, page, user } = options;
+  return Transaction.paginate({
+    user,
+  }, {
+    limit,
+    page,
+    customLabels: {
+      docs: 'items',
+      totalDocs: 'total'
+    },
+    sort: { createdAt: -1 }
+  });
 }

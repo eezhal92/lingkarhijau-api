@@ -6,8 +6,32 @@ import { createShouldValidated } from '../../../middlewares/input-validation';
 import { CreateTransactionCommand } from '../domain/command';
 import { getTransactionTypes } from '../../../lib/transaction';
 
-export function createRoute({ bus }) {
+export function createRoute({ bus, TransactionReadModel }) {
   const router = Router();
+
+  router.get(
+    '/',
+    shouldAuthenticated,
+    function (request, response) {
+      const { userId: actorId } = request;
+      const page = Number(request.query.page || 1);
+      const limit = Number(request.query.limit|| 20);
+
+      const query = {};
+      TransactionReadModel.paginate(query, {
+        page,
+        limit,
+        customLabels: {
+          docs: 'items',
+          totalDocs: 'total'
+        },
+        sort: { createdAt: -1 }
+      })
+        .then((data) => {
+          return response.json(data);
+        })
+    }
+  );
 
   router.post(
     '/',
