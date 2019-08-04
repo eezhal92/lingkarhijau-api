@@ -2,10 +2,9 @@ import cors from 'cors';
 import express from 'express';
 import bodyParser from 'body-parser';
 
-import routes from './routes';
 import { UnprocessableEntityError, HTTPError } from './lib/errors';
 
-export default function createServer() {
+export default function createServer({ routes }) {
   const app = express();
 
   app.use(cors({
@@ -37,7 +36,7 @@ export default function createServer() {
     start: () => new Promise((resolve) => {
       const port = process.env.PORT || 3000;
       app.listen(port, () => {
-        console.log(`Listening on port: ${port}`);
+        console.log(`[http] Listening on port: ${port}`);
         resolve();
       });
     })

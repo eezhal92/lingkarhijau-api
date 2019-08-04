@@ -7,10 +7,16 @@ import { routes as authRoutes } from './modules/auth';
 import { routes as accountRoutes } from './modules/account';
 import { routes as pickupRoutes } from './modules/pickup';
 
-const router = Router();
+import { createRoute } from './modules/trash-pricing/http/routes';
 
-router.use('/auth', authRoutes);
-router.use('/accounts', accountRoutes);
-router.use('/pickups', pickupRoutes);
+export default function createRoutes(cradle) {
+  const router = Router();
 
-export default router;
+  router.use('/auth', authRoutes);
+  router.use('/accounts', accountRoutes);
+  router.use('/pickups', pickupRoutes);
+
+  router.use('/trash-pricings', createRoute(cradle))
+
+  return router;
+}
