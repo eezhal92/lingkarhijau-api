@@ -1,4 +1,4 @@
-import { Pickup } from '../../../db/models';
+import { Pickup, User } from '../../../db/models';
 
 /**
  * Create new pickup request.
@@ -16,22 +16,39 @@ export function create(payload) {
   });
 }
 
+/**
+ * @param {object} payload
+ * @param {number} payload.limit
+ * @param {number} payload.page
+ * @param {string} payload.day   today | tomorrow | after_tomorrow
+ * @param {string} payload.actor the user id who do the request
+ */
 export function find(payload) {
-  const { page = 1, limit = 20 } = payload;
-  const query = {};
+  const { page = 1, limit = 20, actor } = payload;
 
-  if (payload.userId) query.user = payload.userId;
-  if (payload.status) query.status = payload.status;
+  return User.findById(actor)
+    .then((data) => {
+      // todo: do validation. and use constants
+      const isMember = data.type === "MEMBER";
+      return isMember;
+    })
+    .then((isMember) => {
+      const query = {};
 
-  return Pickup.paginate(query, {
-    page,
-    limit,
-    customLabels: {
-      docs: 'items',
-      totalDocs: 'total'
-    },
-    sort: { createdAt: -1 }
-  });
+      if (isMember) query.user = payload.actor;
+      if (payload.status) query.status = payload.status;
+
+      return Pickup.paginate(query, {
+        page,
+        limit,
+        customLabels: {
+          docs: 'items',
+          totalDocs: 'total'
+        },
+        populate: { path: 'user' },
+        sort: { createdAt: -1 }
+      });
+    });
 }
 
 /**

@@ -104,6 +104,9 @@ export async function activate(code) {
 
   user.activationCode = null;
   user.activated = true;
+
+  // todo: create user Balance
+
   await user.save();
   await mail.sendMime({
     from: 'support@lingkarhijau.net',

@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Hashids from 'hashids';
-import { User } from '../../../db/models';
+import { User, UserBalance } from '../../../db/models';
 import { EmailIsTakenError } from '../errors';
 import * as mail from '../../../lib/mail';
 
@@ -25,11 +25,16 @@ export async function findByEmailAndPassword(payload) {
   if (!user) return null;
 
   const isPasswordMatch = bcrypt.compareSync(payload.password, user.password);
+  const userBalance = await UserBalance.findOne({ user: user._id });
 
   if (!isPasswordMatch) return null;
 
+  let balance = 0;
+  if (userBalance) balance = userBalance.balance;
+
   user = user.toJSON();
   delete user.password;
+  user.balance =balance;
 
   return user;
 }

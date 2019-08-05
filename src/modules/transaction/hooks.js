@@ -27,10 +27,11 @@ export function registerHandlers({
   userBalanceESRepo,
   TransactionReadModel,
   UserBalanceReadModel,
+  PickupModel,
 }) {
   userBalanceQueue.register(new UserBalanceView(UserBalanceReadModel).handle);
 
-  bus.registerHandler(CreateTransactionCommand, new CreateTransactionCommandHandler(TransactionReadModel, userBalanceESRepo).handle);
+  bus.registerHandler(CreateTransactionCommand, new CreateTransactionCommandHandler(TransactionReadModel, userBalanceESRepo, PickupModel).handle);
   bus.registerHandler(UserBalanceAddedEvent, userBalanceQueue.push);
   bus.registerHandler(UserBalanceReducedEvent, userBalanceQueue.push);
 }

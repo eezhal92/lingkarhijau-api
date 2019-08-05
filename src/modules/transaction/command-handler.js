@@ -1,10 +1,12 @@
 import { createTransaction } from './domain/service';
 import { UserBalanceAddedEvent, UserBalanceReducedEvent } from './domain/event';
 import { TransactionTypes } from '../../lib/transaction';
+import { PickupStatus } from '../../lib/pickup';
 
 export class CreateTransactionCommandHandler {
-  constructor (TransactionModel, userBalanceESRepo) {
+  constructor (TransactionModel, userBalanceESRepo, PickupModel) {
     this.transactionModel = TransactionModel;
+    this.pickupModel = PickupModel;
     this.userBalanceESRepo = userBalanceESRepo;
     this.handle = this.handle.bind(this);
   }
@@ -57,7 +59,21 @@ export class CreateTransactionCommandHandler {
       transaction: donationTrx.toObject(),
     }), true);
 
+    await this.markPickupRequestAsDone(command.data.pickup);
+
     return this.userBalanceESRepo.save(userBalance);
+  }
+
+  async markPickupRequestAsDone(pickupId) {
+    if (!pickupId) return Promise.resolve();
+
+    const pickupRequest = await this.pickupModel.findById(pickupId);
+
+    if (!pickupRequest) return Promise.resolve();
+
+    pickupRequest.status = PickupStatus.DONE;
+
+    return pickupRequest.save();
   }
 
   /**
@@ -76,6 +92,8 @@ export class CreateTransactionCommandHandler {
       transaction: trx.toObject(),
     }), true);
 
+    await this.markPickupRequestAsDone(command.data.pickup);
+
     return this.userBalanceESRepo.save(userBalance);
   }
 
@@ -83,17 +101,33 @@ export class CreateTransactionCommandHandler {
    * @param {import("./domain/command").CreateTransactionCommand} command
    */
   async _handleQuickCash(command) {
-    const quickCashData = createTransaction(command.data);
+    const depositData = createTransaction({
+      ...command.data,
+      type: TransactionTypes.DEPOSIT,
+    });
+    const redeemData = createTransaction({
+      ...command.data,
+      type: TransactionTypes.REDEEM,
+    });
 
-    const trx = await this.transactionModel.create(quickCashData);
+    const depositTrx = await this.transactionModel.create(depositData);
+    const redeemTrx = await this.transactionModel.create(redeemData);
     const userBalance = await this.userBalanceESRepo.findById(command.data.user);
 
     userBalance.apply(new UserBalanceAddedEvent({
       actor: command.data.actor,
       user: command.data.user,
-      amount: 0,
-      transaction: trx.toObject(),
+      amount: command.data.amount,
+      transaction: depositTrx.toObject(),
     }), true);
+    userBalance.apply(new UserBalanceReducedEvent({
+      actor: command.data.actor,
+      user: command.data.user,
+      amount: command.data.amount,
+      transaction: redeemTrx.toObject(),
+    }), true);
+
+    await this.markPickupRequestAsDone(command.data.pickup);
 
     return this.userBalanceESRepo.save(userBalance);
   }

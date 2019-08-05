@@ -10,8 +10,7 @@ export class UserBalanceQueue {
   register(handler) {
     this.queue.process((job, done) => {
       const event = job.data;
-      handler(event)
-        .then(done);
+      handler(event).then(done);
     });
   }
 
