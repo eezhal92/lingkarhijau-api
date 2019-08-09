@@ -8,6 +8,7 @@ import * as handlers from './handlers';
 const router = Router();
 
 router.get('/', shouldAuthenticated, handlers.getAll);
+
 router.patch(
   '/:id',
   shouldAuthenticated,
@@ -20,6 +21,13 @@ router.patch(
   }),
   handlers.update
 );
+
+router.post(
+  '/:id/cancelation',
+  shouldAuthenticated,
+  handlers.cancel
+);
+
 router.post(
   '/',
   shouldAuthenticated,

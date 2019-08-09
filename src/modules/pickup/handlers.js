@@ -73,3 +73,18 @@ export async function update(request, response, next) {
     pickup,
   });
 }
+
+export async function cancel(request, response, next) {
+  const { id } = request.params;
+  const { userId } = request;
+
+  console.log(`user: ${userId} trying to cancel pickup request: ${id}`);
+
+  return pickupService.cancel(id)
+    .then(pickup => response.json({
+      pickup,
+    }))
+    .catch((error) => {
+      next(error);
+    });
+}

@@ -1,4 +1,5 @@
 import { Pickup, User } from '../../../db/models';
+import { PickupStatus } from '../../../lib/pickup';
 
 /**
  * Create new pickup request.
@@ -75,4 +76,17 @@ export function update(payload) {
     },
     { new: true }
   );
+}
+
+export async function cancel(pickupId) {
+  const pickup = await Pickup.findById(pickupId);
+
+  if (!pickup) throw new EntityNotFound('Not found');
+  if (pickup.status === PickupStatus.DONE) {
+    throw new Error('Cannot cancel completed pickup');
+  }
+
+  pickup.status = PickupStatus.CANCELLED;
+
+  return pickup.save();
 }
