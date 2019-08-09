@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 import { TrashPricing } from './domain';
-import { TrashPricingCreatedEvent, TrashPricingUpdatedEvent } from './event';
+import {
+  TrashPricingCreatedEvent,
+  TrashPricingUpdatedEvent,
+  TrashPricingArchivedEvent,
+  TrashPricingUnarchivedEvent
+} from './event';
 
 export class CreateTrashPricingCommandHandler {
   /**
@@ -57,6 +62,42 @@ export class UpdateTrashPricingCommandHandler {
       type: command.data.type,
       description: command.data.description
     }), true);
+
+    this.trashPricingESRepo.save(trashPricing);
+  }
+}
+
+export class ToggleTrashPricingCommandHandler {
+  /**
+   * @param  {TrashPricingESRepo} trashPricingESRepo
+   */
+  constructor(trashPricingESRepo) {
+    this.trashPricingESRepo = trashPricingESRepo;
+    this.handle = this.handle.bind(this);
+  }
+
+  async handle(command) {
+    const trashPricing = await this.trashPricingESRepo.findById(command.data.id);
+
+    if (!trashPricing) {
+      console.log('cannot find trash pricing id ', command.data.id);
+      return;
+    }
+
+    let event = null;
+
+    if (command.data.archived) {
+      event = new TrashPricingArchivedEvent({
+        id: command.data.id,
+        actor: command.data.actor,
+      });
+    } else {
+      event = new TrashPricingUnarchivedEvent({
+        id: command.data.id,
+        actor: command.data.actor,
+      });
+    }
+    trashPricing.apply(event, true);
 
     this.trashPricingESRepo.save(trashPricing);
   }

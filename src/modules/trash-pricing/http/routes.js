@@ -4,7 +4,11 @@ import { shouldAuthenticated } from '../../../middlewares/auth';
 import { createShouldValidated } from '../../../middlewares/input-validation';
 
 import { getValidTrashTypes } from '../../../lib/trash-pricing';
-import { CreateTrashPricingCommand, UpdateTrashPricingCommand } from '../command';
+import {
+  CreateTrashPricingCommand,
+  UpdateTrashPricingCommand,
+  ToggleTrashPricingCommand,
+} from '../command';
 
 export function createRoute({ bus, TrashPricingReadModel }) {
   const router = Router();
@@ -76,6 +80,29 @@ export function createRoute({ bus, TrashPricingReadModel }) {
 
       return response.json({
         message: 'Processing update...'
+      });
+    }
+  );
+
+  router.patch(
+    '/:id/archives',
+    shouldAuthenticated,
+    createShouldValidated({
+      archived: 'required|boolean',
+    }),
+    function (request, response) {
+      const { userId } = request;
+      const { archived } = request.body;
+      const { id } = request.params;
+
+      bus.send(new ToggleTrashPricingCommand({
+        actor: userId,
+        id,
+        archived,
+      }));
+
+      return response.json({
+        message: 'Processing archive...'
       });
     }
   );

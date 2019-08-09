@@ -2,9 +2,22 @@ import { asClass } from 'awilix';
 
 import { TrashPricingESRepo } from './es-repo';
 import TrashPricingView from './projection';
-import { TrashPricingCreatedEvent, TrashPricingUpdatedEvent } from './event';
-import { CreateTrashPricingCommand, UpdateTrashPricingCommand } from './command';
-import { CreateTrashPricingCommandHandler, UpdateTrashPricingCommandHandler } from './command-handler';
+import {
+  TrashPricingCreatedEvent,
+  TrashPricingUpdatedEvent,
+  TrashPricingArchivedEvent,
+  TrashPricingUnarchivedEvent,
+} from './event';
+import {
+  CreateTrashPricingCommand,
+  UpdateTrashPricingCommand,
+  ToggleTrashPricingCommand,
+} from './command';
+import {
+  CreateTrashPricingCommandHandler,
+  UpdateTrashPricingCommandHandler,
+  ToggleTrashPricingCommandHandler,
+} from './command-handler';
 
 /**
  * Register to ioc container
@@ -25,6 +38,9 @@ export function registerServices(container) {
 export function registerHandlers({ bus, trashPricingESRepo, TrashPricingReadModel }) {
   bus.registerHandler(CreateTrashPricingCommand, new CreateTrashPricingCommandHandler(trashPricingESRepo).handle);
   bus.registerHandler(UpdateTrashPricingCommand, new UpdateTrashPricingCommandHandler(trashPricingESRepo).handle);
+  bus.registerHandler(ToggleTrashPricingCommand, new ToggleTrashPricingCommandHandler(trashPricingESRepo).handle);
   bus.registerHandler(TrashPricingCreatedEvent, new TrashPricingView(TrashPricingReadModel).handle);
   bus.registerHandler(TrashPricingUpdatedEvent, new TrashPricingView(TrashPricingReadModel).handle);
+  bus.registerHandler(TrashPricingArchivedEvent, new TrashPricingView(TrashPricingReadModel).handle);
+  bus.registerHandler(TrashPricingUnarchivedEvent, new TrashPricingView(TrashPricingReadModel).handle);
 }

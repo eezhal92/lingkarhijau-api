@@ -11,12 +11,6 @@ export class UserBalanceView {
    */
   async handle(event) {
     let userBalance = await this.userBalanceModel.findOne({ user: event.data.user });
-    console.log('UserBalanceView projection start:', {
-      event: event.name,
-      amount: event.data.amount,
-    });
-
-    console.log('Before Balance:', userBalance.balance);
 
     if (event.name ===  'UserBalanceAddedEvent') {
       userBalance.balance += event.data.amount;

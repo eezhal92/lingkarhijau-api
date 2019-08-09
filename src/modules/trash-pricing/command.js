@@ -28,3 +28,15 @@ export class UpdateTrashPricingCommand {
     this.data = data;
   }
 }
+
+export class ToggleTrashPricingCommand {
+  /**
+   * @param {object} data
+   * @param {string} data.actor    Id of user
+   * @param {string} data.id
+   * @param {string} data.archived
+   */
+  constructor(data) {
+    this.data = data;
+  }
+}

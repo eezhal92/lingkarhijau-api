@@ -81,6 +81,10 @@ export class TrashPricing {
     }
   }
 
+  _isToggleArchiveEvent (eventName) {
+    return ['TrashPricingArchivedEvent', 'TrashPricingUnarchivedEvent'].includes(eventName);
+  }
+
   handleCreateEvent (data) {
     this.aggregateId = data.id;
     this.id = data.id;

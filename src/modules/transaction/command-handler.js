@@ -1,7 +1,7 @@
-import { createTransaction } from './domain/service';
-import { UserBalanceAddedEvent, UserBalanceReducedEvent } from './domain/event';
-import { TransactionTypes } from '../../lib/transaction';
 import { PickupStatus } from '../../lib/pickup';
+import { createTransaction } from './domain/service';
+import { TransactionTypes } from '../../lib/transaction';
+import { UserBalanceAddedEvent, UserBalanceReducedEvent } from './domain/event';
 
 export class CreateTransactionCommandHandler {
   constructor (TransactionModel, userBalanceESRepo, PickupModel) {

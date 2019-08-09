@@ -29,12 +29,16 @@ export default class TrashPricingView {
         event.data,
       );
     }
-    const isArchivingEvent = event instanceof TrashPricingArchivedEvent || event instanceof TrashPricingUnarchivedEvent;
-    if (isArchivingEvent) {
+
+    if (this._isArchivingEvent(event)) {
       return await this.trashPricingReadModel.findByIdAndUpdate(
         event.data.id,
         { archived: event.data.archived },
       );
     }
+  }
+
+  _isArchivingEvent(event) {
+    return event instanceof TrashPricingArchivedEvent || event instanceof TrashPricingUnarchivedEvent;
   }
 }

@@ -42,13 +42,31 @@ export class TrashPricingUpdatedEvent extends DomainEvent {
 }
 
 export class TrashPricingArchivedEvent extends DomainEvent {
-  constructor() {
+  constructor({ id, actor } = {}) {
     super();
+
+    const now = new Date().toISOString();
+
+    this.data = {
+      id,
+      actor,
+      archived: true,
+      updatedAt: now,
+    };
   }
 }
 
 export class TrashPricingUnarchivedEvent extends DomainEvent {
-  constructor() {
+  constructor({ id, actor } = {}) {
     super();
+
+    const now = new Date().toISOString();
+
+    this.data = {
+      id,
+      actor,
+      archived: false,
+      updatedAt: now,
+    };
   }
 }
