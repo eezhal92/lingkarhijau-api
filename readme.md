@@ -6,11 +6,12 @@
 - MongoDB
 
 ## Todo
-[ ] Unit, integration testing!
+[ ] Account (user - account), RBAC
+[ ] Rate Limiter
+[ ] Atomic transaction for event sourcing (rollback tx etc)
 [ ] Logging
+[ ] Unit, integration testing!
 [ ] Swagger
 [ ] Snapshotting
-[ ] Account (user - account), RBAC
-[ ] Atomic transaction for event sourcing (rollback tx etc)
 [ ] Use DDD ?
 [ ] Lint / Husky / Prettier

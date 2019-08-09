@@ -22,6 +22,7 @@ export function create(payload) {
  * @param {number} payload.limit
  * @param {number} payload.page
  * @param {string} payload.day   today | tomorrow | after_tomorrow
+ * @param {number} payload.status
  * @param {string} payload.actor the user id who do the request
  */
 export function find(payload) {
@@ -37,7 +38,7 @@ export function find(payload) {
       const query = {};
 
       if (isMember) query.user = payload.actor;
-      if (payload.status) query.status = payload.status;
+      if (typeof payload.status === 'number') query.status = payload.status;
 
       return Pickup.paginate(query, {
         page,
