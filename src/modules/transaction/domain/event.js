@@ -1,19 +1,19 @@
 import { DomainEvent } from '../../../lib/domain/event';
 
-export class UserBalanceAddedEvent extends DomainEvent {
+export class AccountBalanceAddedEvent extends DomainEvent {
   /**
    * @param {object} options
    * @param {string} options.actor
-   * @param {string} options.user
+   * @param {string} options.account
    * @param {number} options.amount
    * @param {object} options.transaction
    */
-  constructor({ actor, user, amount, transaction } = {}) {
+  constructor({ actor, account, amount, transaction } = {}) {
     super();
 
     this.data = {
       actor,
-      user,
+      account,
       amount,
       transaction,
       date: new Date().toISOString(),
@@ -21,20 +21,20 @@ export class UserBalanceAddedEvent extends DomainEvent {
   }
 }
 
-export class UserBalanceReducedEvent extends DomainEvent {
+export class AccountBalanceReducedEvent extends DomainEvent {
   /**
    * @param {object} options
    * @param {string} options.actor
-   * @param {string} options.user
+   * @param {string} options.account
    * @param {number} options.amount
    * @param {object} options.transaction
    */
-  constructor({ actor, user, amount, transaction } = {}) {
+  constructor({ actor, account, amount, transaction } = {}) {
     super();
 
     this.data = {
       actor,
-      user,
+      account,
       amount,
       transaction,
       date: new Date().toISOString(),

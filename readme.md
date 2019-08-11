@@ -7,6 +7,7 @@
 
 ## Todo
 [ ] Account (user - account), RBAC
+[ ] Account (user - account), RBAC - Technical Docs
 [ ] Rate Limiter
 [ ] Atomic transaction for event sourcing (rollback tx etc)
 [ ] Logging

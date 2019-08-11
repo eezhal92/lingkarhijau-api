@@ -1,7 +1,7 @@
 import { asClass } from 'awilix';
-import { UserBalanceRepo } from './infra/es-repo';
-import { UserBalanceView } from './projection';
-import { UserBalanceAddedEvent, UserBalanceReducedEvent } from './domain/event';
+import { AccountBalanceRepo } from './infra/es-repo';
+import { AccountBalanceView } from './projection';
+import { AccountBalanceAddedEvent, AccountBalanceReducedEvent } from './domain/event';
 import { CreateTransactionCommand } from './domain/command';
 import { CreateTransactionCommandHandler } from './command-handler';
 
@@ -11,7 +11,7 @@ import { CreateTransactionCommandHandler } from './command-handler';
  */
 export function registerServices(container) {
   container.register({
-    userBalanceESRepo: asClass(UserBalanceRepo).singleton(),
+    accountBalanceESRepo: asClass(AccountBalanceRepo).singleton(),
   });
 }
 
@@ -23,15 +23,15 @@ export function registerServices(container) {
  */
 export function registerHandlers({
   bus,
-  userBalanceQueue,
-  userBalanceESRepo,
+  accountBalanceQueue,
+  accountBalanceESRepo,
   TransactionReadModel,
-  UserBalanceReadModel,
+  AccountBalanceReadModel,
   PickupModel,
 }) {
-  userBalanceQueue.register(new UserBalanceView(UserBalanceReadModel).handle);
+  accountBalanceQueue.register(new AccountBalanceView(AccountBalanceReadModel).handle);
 
-  bus.registerHandler(CreateTransactionCommand, new CreateTransactionCommandHandler(TransactionReadModel, userBalanceESRepo, PickupModel).handle);
-  bus.registerHandler(UserBalanceAddedEvent, userBalanceQueue.push);
-  bus.registerHandler(UserBalanceReducedEvent, userBalanceQueue.push);
+  bus.registerHandler(CreateTransactionCommand, new CreateTransactionCommandHandler(TransactionReadModel, accountBalanceESRepo, PickupModel).handle);
+  bus.registerHandler(AccountBalanceAddedEvent, accountBalanceQueue.push);
+  bus.registerHandler(AccountBalanceReducedEvent, accountBalanceQueue.push);
 }

@@ -2,7 +2,7 @@ import { TransactionTypes } from '../../../lib/transaction';
 
 /**
  * @param {object}      payload
- * @param {string}      payload.user
+ * @param {string}      payload.account
  * @param {string}      payload.type
  * @param {number}      payload.amount
  * @param {string?}     payload.pickup
@@ -21,7 +21,7 @@ export function createTransaction(payload) {
   });
 
   return {
-    user: payload.user,
+    account: payload.account,
     type: payload.type,
     pickup: payload.pickup,
     amount: totalAmount,
@@ -41,7 +41,7 @@ function getItemsTotalAmount(items) {
 
 /**
  * @param {object} payload
- * @param {object} payload.user
+ * @param {object} payload.account
  * @param {import("../types").TransactionType} payload.type
  * @param {import("../types").TrashItem[]} payload.items
  */
@@ -62,7 +62,7 @@ function getTransactionMeta(payload) {
 
 /**
  * @param {object} payload
- * @param {string} payload.user
+ * @param {string} payload.account
  * @param {number} payload.amount
  * @param {import("../types").TrashItem[]} payload.items
  */
@@ -70,21 +70,21 @@ function getDepositMeta(payload) {
   return {
     type: TransactionTypes.DEPOSIT,
     amount: payload.amount,
-    depositor: payload.user,
+    depositor: payload.account,
     items: payload.items
   };
 }
 
 /**
  * @param {object} payload
- * @param {string} payload.user
+ * @param {string} payload.account
  * @param {number} payload.amount
  * @param {import("../types").TrashItem[]} payload.items
  */
 function getQuickCashMeta(payload) {
   return {
     type: TransactionTypes.QUICKCASH,
-    user: payload.user,
+    account: payload.account,
     amount: payload.amount,
     items: payload.items,
   };
@@ -92,26 +92,26 @@ function getQuickCashMeta(payload) {
 
 /**
  * @param {object} payload
- * @param {string} payload.user
+ * @param {string} payload.account
  * @param {number} payload.amount
  */
 function getDonationMeta(payload) {
   return {
     type: TransactionTypes.DONATION,
-    donator: payload.user,
+    donator: payload.account,
     amount: payload.amount
   };
 }
 
 /**
  * @param {object} payload
- * @param {string} payload.user
+ * @param {string} payload.account
  * @param {number} payload.amount
  */
 function getRedeemMeta(payload) {
   return {
     type: TransactionTypes.REDEEM,
-    user: payload.user,
+    account: payload.account,
     amount: payload.amount
   };
 }

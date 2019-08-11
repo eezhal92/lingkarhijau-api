@@ -2,7 +2,7 @@ import httpStatus from 'http-status';
 
 import { EmailIsTakenError } from './errors';
 import * as authService from './services/auth';
-import { Roles } from '../../lib/rbac/constants';
+import { UserTypes } from '../../lib/rbac/constants';
 import { UnprocessableEntityError } from '../../lib/errors';
 
 /**
@@ -10,7 +10,7 @@ import { UnprocessableEntityError } from '../../lib/errors';
  * @param {import("express").Response} response
  */
 export async function login(request, response) {
-  const { email, password } = request.body;
+  const { email, password, mode } = request.body;
 
   const user = await authService.findByEmailAndPassword({
     email,
@@ -23,7 +23,7 @@ export async function login(request, response) {
     });
   }
 
-  const token = authService.createToken(user, process.env.JWT_SECRET);
+  const token = authService.createToken(user, mode, process.env.JWT_SECRET);
 
   return response.json({
     token,
@@ -40,7 +40,10 @@ export async function register(request, response, next) {
     email,
     password,
     name,
-    phone
+    phone,
+    address,
+    accountType,
+    accountSubType
   } = request.body;
 
   let user = null;
@@ -51,7 +54,10 @@ export async function register(request, response, next) {
       password,
       name,
       phone,
-      type: Roles.MEMBER,
+      accountType,
+      address,
+      accountSubType,
+      type: UserTypes.END_USER,
     });
   } catch (error) {
     if (error instanceof EmailIsTakenError) {

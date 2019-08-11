@@ -7,6 +7,10 @@ const PickupSchema = Schema({
     type: Schema.Types.ObjectId,
     ref: 'User'
   },
+  account: {
+    type: Schema.Types.ObjectId,
+    ref: 'Account'
+  },
   address: { type: String, required: true },
   coordinate: { type: String, required: true },
   date: { type: String, required: true },

@@ -7,13 +7,13 @@ import server from './server';
 
 import es from './es';
 import Bus from './lib/bus';
-import { UserBalanceQueue } from './lib/queue';
+import { AccountBalanceQueue } from './lib/queue';
 import registerHandlers from './handlers-registration';
 
 import PickupModel from './db/models/Pickup';
 import TrashPricingReadModel from './db/models/TrashPricing';
 import TransactionReadModel from './db/models/Transaction';
-import UserBalanceReadModel from './db/models/UserBalance';
+import AccountBalanceReadModel from './db/models/AccountBalance';
 
 import { registerServices as registerTransactionServices } from './modules/transaction/hooks';
 import { registerServices as registerTrashPricingServices } from './modules/trash-pricing/hooks';
@@ -30,10 +30,10 @@ container.register({
   routes: awilix.asFunction(routes).singleton(),
   registerHandlers: awilix.asFunction(registerHandlers),
 
-  userBalanceQueue: awilix.asClass(UserBalanceQueue).singleton(),
+  accountBalanceQueue: awilix.asClass(AccountBalanceQueue).singleton(),
   TrashPricingReadModel: awilix.asValue(TrashPricingReadModel),
   TransactionReadModel: awilix.asValue(TransactionReadModel),
-  UserBalanceReadModel: awilix.asValue(UserBalanceReadModel),
+  AccountBalanceReadModel: awilix.asValue(AccountBalanceReadModel),
   PickupModel: awilix.asValue(PickupModel),
 });
 

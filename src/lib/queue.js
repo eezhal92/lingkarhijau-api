@@ -1,8 +1,8 @@
 import Queue from 'bull';
 
-export class UserBalanceQueue {
+export class AccountBalanceQueue {
   constructor () {
-    this.queue = new Queue('lingkarhijau.user_balance', process.env.REDIS_URL);
+    this.queue = new Queue('lingkarhijau.account_balance', process.env.REDIS_URL);
     this.register = this.register.bind(this);
     this.push = this.push.bind(this);
   }

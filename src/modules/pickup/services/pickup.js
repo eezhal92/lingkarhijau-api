@@ -5,7 +5,7 @@ import { PickupStatus } from '../../../lib/pickup';
  * Create new pickup request.
  * @param {object} payload
  * @param {string} payload.date
- * @param {string} payload.userId
+ * @param {string} payload.accountId
  * @param {string} payload.address
  * @param {string} payload.type
  * @param {string} payload.coordinate
@@ -13,7 +13,7 @@ import { PickupStatus } from '../../../lib/pickup';
 export function create(payload) {
   return Pickup.create({
     ...payload,
-    user: payload.userId
+    account: payload.accountId
   });
 }
 
@@ -21,36 +21,28 @@ export function create(payload) {
  * @param {object} payload
  * @param {number} payload.limit
  * @param {number} payload.page
+ * @param {string} payload.user
  * @param {string} payload.day   today | tomorrow | after_tomorrow
  * @param {number} payload.status
  * @param {string} payload.actor the user id who do the request
  */
 export function find(payload) {
-  const { page = 1, limit = 20, actor } = payload;
+  const { page = 1, limit = 20 } = payload;
+  const query = {};
 
-  return User.findById(actor)
-    .then((data) => {
-      // todo: do validation. and use constants
-      const isMember = data.type === "MEMBER";
-      return isMember;
-    })
-    .then((isMember) => {
-      const query = {};
+  if (payload.query) query.user = payload.query;
+  if (typeof payload.status === 'number') query.status = payload.status;
 
-      if (isMember) query.user = payload.actor;
-      if (typeof payload.status === 'number') query.status = payload.status;
-
-      return Pickup.paginate(query, {
-        page,
-        limit,
-        customLabels: {
-          docs: 'items',
-          totalDocs: 'total'
-        },
-        populate: { path: 'user' },
-        sort: { createdAt: -1 }
-      });
-    });
+  return Pickup.paginate(query, {
+    page,
+    limit,
+    customLabels: {
+      docs: 'items',
+      totalDocs: 'total'
+    },
+    populate: { path: 'user' },
+    sort: { createdAt: -1 }
+  });
 }
 
 /**

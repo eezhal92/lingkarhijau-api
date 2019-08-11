@@ -2,7 +2,12 @@ import bcrypt from 'bcrypt';
 import Hashids from 'hashids';
 
 import * as mail from '../../../lib/mail';
-import { User, UserBalance, ResetPassword, Transaction } from '../../../db/models';
+import {
+  User,
+  AccountBalance,
+  ResetPassword,
+  Transaction,
+} from '../../../db/models';
 import { AccountNotFound } from '../errors';
 
 const HASH_SALT = 10;
@@ -76,15 +81,16 @@ export async function saveNewPassword(payload) {
   return true;
 }
 
-export function getMe(id) {
+export function getMe({ userId, accountId } = {}) {
+  console.log(userId, accountId)
   return Promise.all([
-    UserBalance.findOne({ user: id }),
-    User.findById(id),
+    AccountBalance.findOne({ account: accountId }),
+    User.findById(userId),
   ])
-    .then(([userBalance, user]) => {
+    .then(([accountBalance, user]) => {
       let balance = 0;
-      if (userBalance) {
-        balance = userBalance.balance;
+      if (accountBalance) {
+        balance = accountBalance.balance;
       }
 
       return Object.assign(user.toObject(), {
@@ -104,8 +110,6 @@ export async function activate(code) {
 
   user.activationCode = null;
   user.activated = true;
-
-  // todo: create user Balance
 
   await user.save();
   await mail.sendMime({

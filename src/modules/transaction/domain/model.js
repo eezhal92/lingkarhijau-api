@@ -1,13 +1,13 @@
-export class UserBalance {
+export class AccountBalance {
   constructor({
     id,
-    user,
+    account,
     balance,
     createdAt,
     updatedAt,
   } = {}) {
     this.id = id;
-    this.user = user;
+    this.account = account;
     this.balance = balance || 0;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
@@ -27,7 +27,7 @@ export class UserBalance {
    * @param  {object|null} snapshot
    * @param  {object} snapshot.data
    * @param  {string} snap.data.id
-   * @param  {string} snap.data.user
+   * @param  {string} snap.data.account
    * @param  {number} snap.data.balance
    * @param  {string} snap.data.createdAt
    * @param  {string} snap.data.updatedAt
@@ -42,7 +42,7 @@ export class UserBalance {
 
     this.aggregateId = data.id;
     this.id = data.id;
-    this.user = data.user;
+    this.account = data.account;
     this.balance = data.balance;
     this.createdAt = data.createdAt;
     this.updatedAt = data.updatedAt;
@@ -59,9 +59,9 @@ export class UserBalance {
   }
 
   apply(event, isNew = false) {
-    if (event.name === 'UserBalanceAddedEvent') {
+    if (event.name === 'AccountBalanceAddedEvent') {
       this.balance += event.data.amount;
-    } else if (event.name === 'UserBalanceReducedEvent') {
+    } else if (event.name === 'AccountBalanceReducedEvent') {
       this.balance -= event.data.amount;
     }
 
@@ -73,7 +73,7 @@ export class UserBalance {
   getSnap() {
     return {
       id: this.id,
-      user: this.user,
+      account: this.account,
       balance: this.balance,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,

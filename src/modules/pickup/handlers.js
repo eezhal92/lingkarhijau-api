@@ -4,7 +4,7 @@ import { EntityNotFound } from '../../lib/errors';
 export async function getAll(request, response) {
   const status = Number(request.query.status);
   const result = await pickupService.find({
-    actor: request.userId,
+    user: request.query.user,
     day: request.query.day,
     page: Number(request.query.page || 1),
     limit: Number(request.query.limit|| 20),
@@ -15,7 +15,7 @@ export async function getAll(request, response) {
 }
 
 export async function create(request, response, next) {
-  const userId = request.userId;
+  const accountId = request.accountId;
   const {
     date,
     note = '',
@@ -28,7 +28,7 @@ export async function create(request, response, next) {
 
   try {
     pickup = await pickupService.create({
-      userId,
+      accountId,
       date,
       note,
       type,

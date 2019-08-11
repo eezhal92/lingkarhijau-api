@@ -15,7 +15,7 @@ import { getTransactionTypes } from '../../lib/transaction';
  * This models store transactions when picking user's trash
  */
 const TransactionSchema = Schema({
-  user: { type: Schema.Types.ObjectId, ref: 'User' },
+  account: { type: Schema.Types.ObjectId, ref: 'Account' },
 
   type: { type: String, required: true, enum: getTransactionTypes() },
 

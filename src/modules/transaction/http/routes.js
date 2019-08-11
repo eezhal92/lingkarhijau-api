@@ -35,22 +35,23 @@ export function createRoute({ bus, TransactionReadModel }) {
 
   router.post(
     '/',
+    // todo validate roles
     shouldAuthenticated,
     createShouldValidated({
       amount: 'required|integer',
-      user: 'required', // the customer
+      account: 'required', // the customer
       type: `required|in:${getTransactionTypes()}`,
     }),
     function (request, response) {
       const { userId: actorId } = request;
-      const { amount, user: userId, type, items, pickup } = request.body;
+      const { amount, account: accountId, type, items, pickup } = request.body;
 
       // todo: validate pickup and items, if the type either of donation, deposit, or quickcash
       // todo: validate if the user customer exists or not
 
       bus.send(new CreateTransactionCommand({
         actor: actorId,
-        user: userId,
+        account: accountId,
         type,
         amount,
         items,

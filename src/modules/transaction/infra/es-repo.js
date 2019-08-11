@@ -1,6 +1,6 @@
-import { UserBalance } from '../domain/model';
+import { AccountBalance } from '../domain/model';
 
-export class UserBalanceRepo {
+export class AccountBalanceRepo {
   constructor({ eventstore }) {
     this.es = eventstore;
   }
@@ -9,30 +9,30 @@ export class UserBalanceRepo {
     return new Promise((resolve, reject) => {
       this.es.getFromSnapshot({
         aggregateId: id,
-        aggregate: 'userBalance',
+        aggregate: 'accountBalance',
       }, function (error, snapshot, stream) {
         if (error) return reject(error);
 
         const history = stream.events;
-        const userBalance = new UserBalance({ id });
+        const accountBalance = new AccountBalance({ id });
 
-        userBalance.loadSnapshot(snapshot);
-        userBalance.loadFromHistory(history.map(history => history.payload));
+        accountBalance.loadSnapshot(snapshot);
+        accountBalance.loadFromHistory(history.map(history => history.payload));
 
-        return resolve(userBalance);
+        return resolve(accountBalance);
       })
     });
   }
 
-  save (userBalance) {
+  save (accountBalance) {
     return new Promise((resolve, reject) => {
       this.es.getFromSnapshot({
-        aggregateId: userBalance.id,
-        aggregate: 'userBalance'
+        aggregateId: accountBalance.id,
+        aggregate: 'accountBalance'
       }, async function (error, snapshot, stream) {
         if (error) return reject(error);
 
-        const uncommitedChanges = userBalance.getUncommittedChanges();
+        const uncommitedChanges = accountBalance.getUncommittedChanges();
 
         for (let i = 0; i < uncommitedChanges.length; i += 1) {
           const event = uncommitedChanges[i];
@@ -40,12 +40,10 @@ export class UserBalanceRepo {
         }
 
         stream.commit();
-        userBalance.markChangesAsCommitted();
+        accountBalance.markChangesAsCommitted();
 
         resolve();
       });
     });
   }
 }
-
-exports.UserBalanceRepo = UserBalanceRepo;

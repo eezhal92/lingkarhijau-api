@@ -2,7 +2,7 @@ export class CreateTransactionCommand {
   /**
    * @param {object}      options
    * @param {string}      options.actor   Who initiate the transaction
-   * @param {string}      options.user
+   * @param {string}      options.account
    * @param {number}      options.amount
    * @param {string}      options.type     quickcash | deposit | redeem | donation
    * @param {string?}     options.pickup
@@ -10,7 +10,7 @@ export class CreateTransactionCommand {
    */
   constructor({
     actor,
-    user,
+    account,
     type,
     amount,
     pickup = null,
@@ -18,7 +18,7 @@ export class CreateTransactionCommand {
   } = {}) {
     this.data = {
       actor,
-      user,
+      account,
       type,
       pickup,
       amount,

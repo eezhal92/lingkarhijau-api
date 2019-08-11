@@ -1,13 +1,13 @@
 import { PickupStatus } from '../../lib/pickup';
 import { createTransaction } from './domain/service';
 import { TransactionTypes } from '../../lib/transaction';
-import { UserBalanceAddedEvent, UserBalanceReducedEvent } from './domain/event';
+import { AccountBalanceAddedEvent, AccountBalanceReducedEvent } from './domain/event';
 
 export class CreateTransactionCommandHandler {
-  constructor (TransactionModel, userBalanceESRepo, PickupModel) {
+  constructor (TransactionModel, accountBalanceESRepo, PickupModel) {
     this.transactionModel = TransactionModel;
     this.pickupModel = PickupModel;
-    this.userBalanceESRepo = userBalanceESRepo;
+    this.accountBalanceESRepo = accountBalanceESRepo;
     this.handle = this.handle.bind(this);
   }
 
@@ -15,6 +15,13 @@ export class CreateTransactionCommandHandler {
    * @param {import("./domain/command").CreateTransactionCommand} command
    */
   handle(command) {
+    switch(command.data.type) {
+      case 'deposit':
+      case 'donation':
+      case 'quickcash':
+        this._validatePickup(command);
+    }
+
     switch(command.data.type) {
       case 'deposit':
         return this._handleDeposit(command);
@@ -25,6 +32,16 @@ export class CreateTransactionCommandHandler {
       case 'redeem':
           return this._handleRedeem(command);
     }
+  }
+
+  async _validatePickup(command) {
+    // todo: fix this validation. still not works
+    if (!command.data.pickup) return;
+
+    const pickup = await this.pickupModel.findById(command.data.pickup);
+
+    if (!pickup) throw new Error('Pickup not found');
+    if (pickup.status !== PickupStatus.PLACED) throw new Error('This pickup either has been cancelled or done');
   }
 
   /**
@@ -44,24 +61,24 @@ export class CreateTransactionCommandHandler {
     const depositTrx = await this.transactionModel.create(depositData);
     const donationTrx = await this.transactionModel.create(donationData);
 
-    const userBalance = await this.userBalanceESRepo.findById(command.data.user);
+    const accountBalance = await this.accountBalanceESRepo.findById(command.data.account);
 
-    userBalance.apply(new UserBalanceAddedEvent({
+    accountBalance.apply(new AccountBalanceAddedEvent({
       actor: command.data.actor,
-      user: command.data.user,
+      account: command.data.account,
       amount: command.data.amount,
       transaction: depositTrx.toObject(),
     }), true);
-    userBalance.apply(new UserBalanceReducedEvent({
+    accountBalance.apply(new AccountBalanceReducedEvent({
       actor: command.data.actor,
-      user: command.data.user,
+      account: command.data.account,
       amount: command.data.amount,
       transaction: donationTrx.toObject(),
     }), true);
 
     await this.markPickupRequestAsDone(command.data.pickup);
 
-    return this.userBalanceESRepo.save(userBalance);
+    return this.accountBalanceESRepo.save(accountBalance);
   }
 
   async markPickupRequestAsDone(pickupId) {
@@ -83,18 +100,18 @@ export class CreateTransactionCommandHandler {
     const depositData = createTransaction(command.data);
 
     const trx = await this.transactionModel.create(depositData);
-    const userBalance = await this.userBalanceESRepo.findById(command.data.user);
+    const accountBalance = await this.accountBalanceESRepo.findById(command.data.account);
 
-    userBalance.apply(new UserBalanceAddedEvent({
+    accountBalance.apply(new AccountBalanceAddedEvent({
       actor: command.data.actor,
-      user: command.data.user,
+      account: command.data.account,
       amount: command.data.amount,
       transaction: trx.toObject(),
     }), true);
 
     await this.markPickupRequestAsDone(command.data.pickup);
 
-    return this.userBalanceESRepo.save(userBalance);
+    return this.accountBalanceESRepo.save(accountBalance);
   }
 
   /**
@@ -112,24 +129,24 @@ export class CreateTransactionCommandHandler {
 
     const depositTrx = await this.transactionModel.create(depositData);
     const redeemTrx = await this.transactionModel.create(redeemData);
-    const userBalance = await this.userBalanceESRepo.findById(command.data.user);
+    const accountBalance = await this.accountBalanceESRepo.findById(command.data.account);
 
-    userBalance.apply(new UserBalanceAddedEvent({
+    accountBalance.apply(new AccountBalanceAddedEvent({
       actor: command.data.actor,
-      user: command.data.user,
+      account: command.data.account,
       amount: command.data.amount,
       transaction: depositTrx.toObject(),
     }), true);
-    userBalance.apply(new UserBalanceReducedEvent({
+    accountBalance.apply(new AccountBalanceReducedEvent({
       actor: command.data.actor,
-      user: command.data.user,
+      account: command.data.account,
       amount: command.data.amount,
       transaction: redeemTrx.toObject(),
     }), true);
 
     await this.markPickupRequestAsDone(command.data.pickup);
 
-    return this.userBalanceESRepo.save(userBalance);
+    return this.accountBalanceESRepo.save(accountBalance);
   }
 
   /**
@@ -139,19 +156,19 @@ export class CreateTransactionCommandHandler {
     const redeemData = createTransaction(command.data);
 
     const trx = await this.transactionModel.create(redeemData);
-    const userBalance = await this.userBalanceESRepo.findById(command.data.user);
+    const accountBalance = await this.accountBalanceESRepo.findById(command.data.account);
 
-    if (userBalance.balance < command.data.amount) {
-      throw new Error(`User balance is not enough: ${userBalance.balance} < ${command.data.amount}`);
+    if (accountBalance.balance < command.data.amount) {
+      throw new Error(`Account balance is not enough: ${accountBalance.balance} < ${command.data.amount}`);
     }
 
-    userBalance.apply(new UserBalanceReducedEvent({
+    accountBalance.apply(new AccountBalanceReducedEvent({
       actor: command.data.actor,
-      user: command.data.user,
+      account: command.data.account,
       amount: command.data.amount,
       transaction: trx.toObject(),
     }), true);
 
-    return this.userBalanceESRepo.save(userBalance);
+    return this.accountBalanceESRepo.save(accountBalance);
   }
 }
