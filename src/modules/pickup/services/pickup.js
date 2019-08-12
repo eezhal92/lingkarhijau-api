@@ -21,7 +21,7 @@ export function create(payload) {
  * @param {object} payload
  * @param {number} payload.limit
  * @param {number} payload.page
- * @param {string} payload.user
+ * @param {string} payload.account
  * @param {string} payload.day   today | tomorrow | after_tomorrow
  * @param {number} payload.status
  * @param {string} payload.actor the user id who do the request
@@ -30,7 +30,7 @@ export function find(payload) {
   const { page = 1, limit = 20 } = payload;
   const query = {};
 
-  if (payload.query) query.user = payload.query;
+  if (payload.account) query.account = payload.account;
   if (typeof payload.status === 'number') query.status = payload.status;
 
   return Pickup.paginate(query, {
@@ -40,7 +40,7 @@ export function find(payload) {
       docs: 'items',
       totalDocs: 'total'
     },
-    populate: { path: 'user' },
+    populate: { path: 'account' },
     sort: { createdAt: -1 }
   });
 }

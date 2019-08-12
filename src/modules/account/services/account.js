@@ -82,7 +82,6 @@ export async function saveNewPassword(payload) {
 }
 
 export function getMe({ userId, accountId } = {}) {
-  console.log(userId, accountId)
   return Promise.all([
     AccountBalance.findOne({ account: accountId }),
     User.findById(userId),
@@ -134,9 +133,9 @@ export async function activate(code) {
  * @param {string} options.user
  */
 export function getTransactions (options) {
-  const { limit, page, user } = options;
+  const { limit, page, account } = options;
   return Transaction.paginate({
-    user,
+    account,
   }, {
     limit,
     page,

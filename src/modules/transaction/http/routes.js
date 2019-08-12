@@ -13,11 +13,14 @@ export function createRoute({ bus, TransactionReadModel }) {
     '/',
     shouldAuthenticated,
     function (request, response) {
-      const { userId: actorId } = request;
+      const { account } = request.query;
       const page = Number(request.query.page || 1);
       const limit = Number(request.query.limit|| 20);
 
       const query = {};
+
+      if (account) query.account = account;
+
       TransactionReadModel.paginate(query, {
         page,
         limit,
