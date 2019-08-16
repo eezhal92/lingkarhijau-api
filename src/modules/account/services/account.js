@@ -84,7 +84,9 @@ export async function saveNewPassword(payload) {
 export function getMe({ userId, accountId } = {}) {
   return Promise.all([
     AccountBalance.findOne({ account: accountId }),
-    User.findById(userId),
+    User.findById(userId)
+      .populate({ path: 'accounts.account' })
+      .exec(),
   ])
     .then(([accountBalance, user]) => {
       let balance = 0;

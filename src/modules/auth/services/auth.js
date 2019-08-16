@@ -20,15 +20,15 @@ function createActivationCode (email) {
  */
 export async function findByEmailAndPassword(payload) {
   let user = await User.findOne({ email: payload.email })
-    .select('id name email +password roles type phone activated accounts');
+    .select('id name email +password roles type phone activated accounts')
+    .populate({ path: 'accounts.account' });
 
   if (!user) return null;
 
   const isPasswordMatch = bcrypt.compareSync(payload.password, user.password);
 
-  const accountId = user.accounts[0].account._id;
-
-  const accountBalance = await AccountBalance.findOne({ account: accountId });
+  const account = user.accounts[0].account;
+  const accountBalance = await AccountBalance.findOne({ account: account._id });
 
   if (!isPasswordMatch) return null;
 
@@ -38,7 +38,7 @@ export async function findByEmailAndPassword(payload) {
   user = user.toJSON();
   delete user.password;
   user.balance = balance;
-  user.account = accountId;
+  user.account = account;
 
   return user;
 }
