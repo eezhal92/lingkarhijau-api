@@ -36,11 +36,11 @@ export function createRoute({ bus, TrashPricingReadModel }) {
       type: `required|in:${getValidTrashTypes()}`,
     }),
     function (request, response) {
-      const { userId } = request;
+      const { user } = request;
       const { name, price, type, unit, description = '' } = request.body;
 
       bus.send(new CreateTrashPricingCommand({
-        actor: userId,
+        actor: user.id,
         name,
         price,
         unit,
@@ -64,12 +64,12 @@ export function createRoute({ bus, TrashPricingReadModel }) {
       type: `required|in:${getValidTrashTypes()}`,
     }),
     function (request, response) {
-      const { userId } = request;
+      const { user } = request;
       const { name, price, type, unit, description = '' } = request.body;
       const { id } = request.params;
 
       bus.send(new UpdateTrashPricingCommand({
-        actor: userId,
+        actor: user.id,
         id,
         name,
         price,
@@ -91,12 +91,12 @@ export function createRoute({ bus, TrashPricingReadModel }) {
       archived: 'required|boolean',
     }),
     function (request, response) {
-      const { userId } = request;
+      const { user } = request;
       const { archived } = request.body;
       const { id } = request.params;
 
       bus.send(new ToggleTrashPricingCommand({
-        actor: userId,
+        actor: user.id,
         id,
         archived,
       }));

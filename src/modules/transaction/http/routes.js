@@ -46,14 +46,14 @@ export function createRoute({ bus, TransactionReadModel }) {
       type: `required|in:${getTransactionTypes()}`,
     }),
     function (request, response) {
-      const { userId: actorId } = request;
+      const { user } = request;
       const { amount, account: accountId, type, items, pickup } = request.body;
 
       // todo: validate pickup and items, if the type either of donation, deposit, or quickcash
       // todo: validate if the user customer exists or not
 
       bus.send(new CreateTransactionCommand({
-        actor: actorId,
+        actor: user.id,
         account: accountId,
         type,
         amount,

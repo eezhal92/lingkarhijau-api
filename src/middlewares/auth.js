@@ -18,9 +18,21 @@ export function shouldAuthenticated(request, response, next) {
     return next(new Error('You are not authenticated'));
   }
 
-  request.userId = claim.id;
-  request.accountId = claim.account;
-  request.userRoles = claim.roles;
+  request.user = {
+    accessMode: claim.accessMode,
+    id: claim.id,
+    email: claim.email,
+    name: claim.name,
+    accountId: claim.accountId,
+    roles: claim.roles,
+    permissions: claim.permissions,
+  };
 
   return next();
+}
+
+export function createShouldAuthorized (permission) {
+  return function(request, response, next) {
+
+  }
 }

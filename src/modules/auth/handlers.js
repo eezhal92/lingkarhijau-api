@@ -2,7 +2,7 @@ import httpStatus from 'http-status';
 
 import { EmailIsTakenError } from './errors';
 import * as authService from './services/auth';
-import { UserTypes } from '../../lib/rbac/constants';
+import { UserTypes, AccessMode } from '../../lib/rbac/constants';
 import { UnprocessableEntityError } from '../../lib/errors';
 
 /**
@@ -10,20 +10,31 @@ import { UnprocessableEntityError } from '../../lib/errors';
  * @param {import("express").Response} response
  */
 export async function login(request, response) {
-  const { email, password, mode } = request.body;
+  const { email, password, mode: accessMode } = request.body;
 
-  const user = await authService.findByEmailAndPassword({
-    email,
-    password,
-  });
 
+  let user = await authService.findUserByEmailAndPassword({ email, password });
   if (!user || !user.activated) {
     return response.status(httpStatus.NOT_FOUND).json({
       message: 'No such account',
     });
   }
 
-  const token = authService.createToken(user, mode, process.env.JWT_SECRET);
+  user = await authService.findUser({
+    accessMode,
+    id: user._id,
+  });
+
+  // check user type, based on access mode
+  // if end user trying to use access mode other than 'enduser',
+  // then returns 404
+  if (user.type === UserTypes.EndUser && accessMode !== AccessMode.EndUser) {
+    return response.status(httpStatus.NOT_FOUND).json({
+      message: 'No such account',
+    });
+  }
+
+  const token = authService.createToken(user, accessMode, process.env.JWT_SECRET);
 
   return response.json({
     token,
@@ -42,8 +53,7 @@ export async function register(request, response, next) {
     name,
     phone,
     address,
-    accountType,
-    accountSubType
+    account,
   } = request.body;
 
   let user = null;
@@ -54,10 +64,9 @@ export async function register(request, response, next) {
       password,
       name,
       phone,
-      accountType,
       address,
-      accountSubType,
-      type: UserTypes.END_USER,
+      account,
+      type: UserTypes.EndUser,
     });
   } catch (error) {
     if (error instanceof EmailIsTakenError) {

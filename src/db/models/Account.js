@@ -21,13 +21,13 @@ const AccountSchema = Schema({
   },
   name: { type: String, required: true },
   address: { type: String, required: true },
-  phone: { type: String, required: true },
+  phone: { type: String },
   email: { type: String },
   features: [],
   users: [
     {
       user: { type: Schema.Types.ObjectId, ref: 'User' },
-      roles: [{ name: String, code: String }],
+      roles: [{ type: Schema.Types.ObjectId, ref: 'AccountRole' }],
     }
   ]
 });

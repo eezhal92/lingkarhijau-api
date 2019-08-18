@@ -59,8 +59,8 @@ export function getResetPasswordRequest(request, response, next) {
  */
 export function getMe(request, response, next) {
   accountService.getMe({
-    userId: request.userId,
-    accountId: request.accountId,
+    userId: request.user.id,
+    accessMode: request.user.accessMode,
   })
     .then((user) => {
       if (!user) return next(new NotFoundError());

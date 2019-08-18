@@ -4,11 +4,13 @@ import Hashids from 'hashids';
 import * as mail from '../../../lib/mail';
 import {
   User,
+  Account,
   AccountBalance,
   ResetPassword,
   Transaction,
 } from '../../../db/models';
 import { AccountNotFound } from '../errors';
+import { findUser } from '../../auth/services/auth';
 
 const HASH_SALT = 10;
 
@@ -81,23 +83,8 @@ export async function saveNewPassword(payload) {
   return true;
 }
 
-export function getMe({ userId, accountId } = {}) {
-  return Promise.all([
-    AccountBalance.findOne({ account: accountId }),
-    User.findById(userId)
-      .populate({ path: 'accounts.account' })
-      .exec(),
-  ])
-    .then(([accountBalance, user]) => {
-      let balance = 0;
-      if (accountBalance) {
-        balance = accountBalance.balance;
-      }
-
-      return Object.assign(user.toObject(), {
-        balance,
-      });
-    })
+export async function getMe({ userId, accessMode } = {}) {
+  return findUser({ id: userId, accessMode });
 }
 
 export function findById(id) {
@@ -147,4 +134,105 @@ export function getTransactions (options) {
     },
     sort: { createdAt: -1 }
   });
+}
+
+/**
+ * Create new account. Account could not be linked to specific user
+ * Like primary school kids, grandma grandpa etc
+ * @param  {object} payload
+ * @return {string} payload.type
+ * @return {string} payload.subType
+ * @return {string} payload.name
+ * @return {string} payload.address
+ * @return {string} payload.phone
+ * @return {string} payload.email
+ */
+export async function createAccount(payload) {
+  const account = await Account.create(payload);
+  await AccountBalance.create({
+    account: account._id,
+    balance: 0,
+  });
+}
+
+async function getAccountUser(userId, accountId) {
+  const user = await User.findById(userId);
+  const account = await Account.findById(accountId);
+  const isUserLinkedToAccount = account.users.map(item => item.user)
+    .includes(userId);
+  const isAccountLinkedToUser = user.accounts.map(item => item.account)
+    .includes(accountId);
+  const isLinked = isUserLinkedToAccount && isAccountLinkedToUser;
+
+  return {
+    isLinked,
+    user,
+    account,
+  }
+}
+
+export async function linkAccountUser(userId, accountId, roles) {
+  const { isLinked, user, account } = await getAccountUser(userId, accountId);
+
+  if (!isLinked) {
+    user.accounts.push({ account: accountId, roles });
+    account.users.push({ user: userId, roles });
+
+    return Promise.all([
+      user.save(),
+      account.save(),
+    ]);
+  }
+
+  return Promise.resolve([]);
+}
+
+export async function unlinkAccountUser(userId, accountId, roles) {
+  const { isLinked, user, account } = await getAccountUser(userId, accountId);
+
+  if (isLinked) {
+    user.accounts = user.accounts.filter(item => item.account !== accountId);
+    account.users = account.users.filter(item => item.user !== userId);
+
+    return Promise.all([
+      user.save(),
+      account.save(),
+    ]);
+  }
+
+  return Promise.resolve([]);
+}
+
+export async function addRole(userId, accountId, role) {
+  const { isLinked, user, account } = await getAccountUser(userId, accountId);
+
+  if (!isLinked) return;
+
+  const userAccount = user.accounts.find(item => item.account === accountId);
+  const accountUser = account.users.find(item => item.user === userId);
+
+  if (!userAccount.roles.includes(role)) userAccount.roles.push(role);
+  if (!accountUser.roles.includes(role)) accountUser.roles.push(role);
+
+  return Promise.all([
+    user.save(),
+    account.save(),
+  ]);
+}
+
+export async function removeRole(userId, accountId, role) {
+  const { isLinked, user, account } = await getAccountUser(userId, accountId);
+
+  if (!isLinked) return;
+
+  const userAccount = user.accounts.find(item => item.account === accountId);
+  const accountUser = account.users.find(item => item.user === userId);
+
+  userAccount.roles = userAccount.roles.filter(_role => _role !== role);
+  accountUser.roles = accountUser.roles.filter(_role => _role !== role);
+
+  return Promise.all([
+    user.save(),
+    account.save(),
+  ]);
 }

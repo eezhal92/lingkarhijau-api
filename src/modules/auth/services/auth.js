@@ -4,6 +4,40 @@ import Hashids from 'hashids';
 import * as mail from '../../../lib/mail';
 import { EmailIsTakenError } from '../errors';
 import { User, AccountBalance, Account } from '../../../db/models';
+import { AccountType, AccessMode } from '../../../lib/rbac/constants';
+import { getDefaultRolesForMember, getDefaultRolesForOrg, getSystemUserRolesAndPermissions } from '../../../lib/rbac/acl';
+import AccountRole from '../../../db/models/AccountRole';
+import { DefaultAccountRoles } from '../../../lib/rbac/roles';
+import { linkAccountUser } from '../../account/services/account';
+
+/**
+ * @param {object} user
+ * @param {object} user.account
+ * @param {string} user.account._id
+ */
+async function getEndUserRolesAndPermissions(user) {
+  const userOfTheAccount = user.account.users.find(item => item.user.toString() === user._id.toString());
+  const roles = await AccountRole.find({ _id: { $in: userOfTheAccount.roles } });
+  const permissions = roles.reduce((acc, item) => acc.concat(item.permissions), []);
+
+  return {
+    roles: roles.map(role => role.code),
+    permissions: Array.from(new Set(permissions)),
+  };
+}
+
+/**
+ *
+ * @param {string} accessMode
+ * @param {object} user
+ */
+export function getUserRolesAndPermissions (accessMode, user) {
+  if (accessMode === AccessMode.EndUser) {
+    return getEndUserRolesAndPermissions(user);
+  }
+
+  return getSystemUserRolesAndPermissions(user);
+}
 
 const HASH_SALT = 10;
 
@@ -13,32 +47,54 @@ function createActivationCode (email) {
   return hashids.encode(number);
 }
 
+export async function findUserByEmailAndPassword({ email, password }) {
+  let user = await User.findOne({ email })
+    .select('id +password activated');
+
+  if (!user) return null;
+
+  const isPasswordMatch = bcrypt.compareSync(password, user.password);
+
+  if (!isPasswordMatch) return null;
+
+  return user;
+}
+
 /**
  * @param {object} payload
- * @param {string} payload.email
- * @param {string} payload.password
+ * @param {string} payload.id
+ * @param {string} payload.accessMode
  */
-export async function findByEmailAndPassword(payload) {
-  let user = await User.findOne({ email: payload.email })
-    .select('id name email +password roles type phone activated accounts')
+export async function findUser(payload) {
+  let user = await User.findById(payload.id)
+    .select('id name email roles type phone activated accounts systemRoles')
     .populate({ path: 'accounts.account' });
 
   if (!user) return null;
 
-  const isPasswordMatch = bcrypt.compareSync(payload.password, user.password);
+  const hasAccount = Boolean(user.accounts) && !!user.accounts.length;
+  const account = hasAccount ? user.accounts[0].account : null;
 
-  const account = user.accounts[0].account;
-  const accountBalance = await AccountBalance.findOne({ account: account._id });
-
-  if (!isPasswordMatch) return null;
-
-  let balance = 0;
-  if (accountBalance) balance = accountBalance.balance;
+  if (payload.accessMode === AccessMode.EndUser && !account) return null;
 
   user = user.toJSON();
+
+  if (hasAccount) {
+    const accountBalance = await AccountBalance.findOne({ account: account._id });
+    user.account = account.toJSON();
+    user.account.balance = accountBalance.balance;
+  }
+
+  const { roles, permissions } = await getUserRolesAndPermissions(payload.accessMode, user);
+
+  user.roles = roles;
+  user.permissions = permissions;
+
   delete user.password;
-  user.balance = balance;
-  user.account = account;
+  delete user.accounts;
+  if (payload.accessMode === AccessMode.EndUser) {
+    delete user.systemRoles;
+  }
 
   return user;
 }
@@ -46,18 +102,19 @@ export async function findByEmailAndPassword(payload) {
 /**
  * @param {import('mongoose').Model} user
  * @param {string} user.account
- * @param {string} mode    enduser | backoffice | operator
+ * @param {string} accessMode    enduser | backoffice | operator
  * @param {string} secret
  */
-export function createToken(user, mode, secret) {
+export function createToken(user, accessMode, secret) {
   if (!secret) throw new Error('Invalid argument. `secret` argument needed');
 
   const claim = {
+    accessMode: accessMode,
     id: user._id,
-    account: user.account,
     email: user.email,
-    // todo: generate lingkar hijau roles or enduser roles
-    mode,
+    account: user.account,
+    roles: user.roles,
+    permissions: user.permissions,
   };
 
   return jwt.sign(claim, secret, {
@@ -83,8 +140,9 @@ export function isEmailTaken(email) {
  * @param {string} payload.phone
  * @param {string} payload.type
  * @param {string} payload.address
- * @param {string} payload.accountType
- * @param {string} payload.accountSubType
+ * @param {object} payload.account
+ * @param {string} payload.account.type
+ * @param {string} payload.account.subType
  * @param {string} payload.initialBalance
  */
 export async function register(payload) {
@@ -108,28 +166,33 @@ export async function register(payload) {
 
   // create account
   const account = await Account.create({
-    name: data.name,
-    phone: data.phone,
-    address: data.address,
-    email: data.email,
-    type: data.accountType,
-    subType: data.accountSubType,
+    name: data.account.name || data.name,
+    phone: data.account.phone || data.phone,
+    address: data.account.address || data.address,
+    email: data.account.email || data.email,
+    type: data.account.type,
+    subType: data.account.subType,
   });
 
   // todo: add initial balance account balance event
   await AccountBalance.create({
     account: account._id,
-    balance: data.initialBalance || 0,
+    balance: 0,
   });
 
-  // Link account and user
-  user.accounts.push({ account: account._id });
-  account.users.push({ user: user._id });
+  // Create Roles
+  let rolesMeta = [];
 
-  await Promise.all([
-    user.save(),
-    account.save(),
-  ]);
+  if (data.account.type === AccountType.Member) {
+    rolesMeta = getDefaultRolesForMember(account._id);
+  } else if (data.account.type === AccountType.Organization) {
+    rolesMeta = getDefaultRolesForOrg(account._id);
+  }
+
+  const roles = await Promise.all(rolesMeta.map(role => AccountRole.create(role)));
+  const ownerRole = roles.find(role => role.code === DefaultAccountRoles.Owner);
+
+  await linkAccountUser(user._id, account._id, [ownerRole._id]);
 
   mail.sendMime({
     from: 'support@lingkarhijau.net',
