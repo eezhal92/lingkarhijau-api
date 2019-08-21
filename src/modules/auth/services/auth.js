@@ -112,7 +112,7 @@ export function createToken(user, accessMode, secret) {
     accessMode: accessMode,
     id: user._id,
     email: user.email,
-    account: user.account,
+    accountId: user.account._id,
     roles: user.roles,
     permissions: user.permissions,
   };

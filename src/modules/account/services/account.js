@@ -123,6 +123,7 @@ export async function activate(code) {
  */
 export function getTransactions (options) {
   const { limit, page, account } = options;
+
   return Transaction.paginate({
     account,
   }, {

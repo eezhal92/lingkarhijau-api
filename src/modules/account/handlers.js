@@ -88,7 +88,7 @@ export async function activate(request, response, next) {
 
 export function getTransactions(request, response) {
   return accountService.getTransactions({
-    account: request.accountId,
+    account: request.user.accountId,
     limit: Number(request.query.limit) || 20,
     page: Number(request.query.page) || 1,
   })
