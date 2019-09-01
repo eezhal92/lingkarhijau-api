@@ -9,6 +9,7 @@ import { getDefaultRolesForMember, getDefaultRolesForOrg, getSystemUserRolesAndP
 import AccountRole from '../../../db/models/AccountRole';
 import { DefaultAccountRoles } from '../../../lib/rbac/roles';
 import { linkAccountUser } from '../../account/services/account';
+import { createRegistrationNumber } from '../../../lib/account';
 
 /**
  * @param {object} user
@@ -112,10 +113,13 @@ export function createToken(user, accessMode, secret) {
     accessMode: accessMode,
     id: user._id,
     email: user.email,
-    accountId: user.account._id,
     roles: user.roles,
     permissions: user.permissions,
   };
+
+  if (user.account) {
+    claim.accountId = user.account._id;
+  }
 
   return jwt.sign(claim, secret, {
     algorithm: 'HS256',
@@ -164,8 +168,18 @@ export async function register(payload) {
     activationCode,
   });
 
+  const lastAccount = await Account.findOne()
+    .sort({ _id: -1 })
+    .exec();
+
+  let previousRegNum = null;
+  if (lastAccount) {
+    previousRegNum = lastAccount.regNo;
+  }
+
   // create account
   const account = await Account.create({
+    regNo: createRegistrationNumber(previousRegNum),
     name: data.account.name || data.name,
     phone: data.account.phone || data.phone,
     address: data.account.address || data.address,

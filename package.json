@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "jest",
     "dev": "nodemon --exec \"node -r esm index.js\""
   },
   "keywords": [],
@@ -31,6 +32,8 @@
     "validatorjs": "^3.15.1"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.5.5",
+    "babel-jest": "^24.9.0",
     "jest": "^24.5.0",
     "nodemon": "^1.19.1"
   }

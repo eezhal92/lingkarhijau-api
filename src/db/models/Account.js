@@ -21,6 +21,7 @@ const AccountSchema = Schema({
   },
   name: { type: String, required: true },
   address: { type: String, required: true },
+  regNo: { type: String, required: true, index: true },
   phone: { type: String },
   email: { type: String },
   features: [],
