@@ -15,7 +15,6 @@ export class AccountBalanceRepo {
 
         const history = stream.events;
         const accountBalance = new AccountBalance({ id });
-
         accountBalance.loadSnapshot(snapshot);
         accountBalance.loadFromHistory(history.map(history => history.payload));
 

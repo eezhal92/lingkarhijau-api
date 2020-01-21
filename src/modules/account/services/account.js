@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import Hashids from 'hashids';
 
@@ -236,4 +237,14 @@ export async function removeRole(userId, accountId, role) {
     user.save(),
     account.save(),
   ]);
+}
+
+export function findAccountByIdOrRegNo (accountIdOrRegNo) {
+  const query = {};
+  if (mongoose.Types.ObjectId.isValid(accountIdOrRegNo)) {
+    query._id = accountIdOrRegNo;
+  } else {
+    query.regNo = accountIdOrRegNo;
+  }
+  return Account.findOne(query);
 }

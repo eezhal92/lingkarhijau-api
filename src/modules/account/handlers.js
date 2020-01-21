@@ -96,3 +96,9 @@ export function getTransactions(request, response) {
       response.json(data);
     });
 }
+
+export async function findAccount(request, response) {
+  const accountIdOrRegNumber = request.params.id;
+  const account = await accountService.findAccountByIdOrRegNo(accountIdOrRegNumber);
+  return response.json({ account });
+}

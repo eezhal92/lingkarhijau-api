@@ -15,6 +15,7 @@ const router = Router();
  * accounts
  *
  * GET  /accounts                  - get all accounts
+ * POST /accounts/                 - create new account
  * POST /accounts/activation       - activate account and user
  * GET  /accounts/:id              - get account
  * GET  /accounts/:id/transactions - get account
@@ -36,5 +37,7 @@ router.post('/activation', handlers.activate);
 router.post('/password/request', handlers.requestResetPassword);
 router.get('/password/request/:code', handlers.getResetPasswordRequest);
 router.post('/password', handlers.saveNewPassword);
+
+router.get('/:id', handlers.findAccount);
 
 export default router;

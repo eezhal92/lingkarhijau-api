@@ -40,7 +40,10 @@ export function find(payload) {
       docs: 'items',
       totalDocs: 'total'
     },
-    populate: { path: 'account' },
+    populate: [
+      { path: 'account' },
+      { path: 'assignee', select: 'name phone' }
+    ],
     sort: { createdAt: -1 }
   });
 }
@@ -56,7 +59,7 @@ export function find(payload) {
  */
 export function update(payload) {
   // todo: logic to prevent fraud
-  const { status, type, address, coordinate, date } = payload;
+  const { status, type, address, coordinate, date, assignee } = payload;
 
   return Pickup.findOneAndUpdate(
     { _id: payload.pickupId },
@@ -65,10 +68,16 @@ export function update(payload) {
       status,
       address,
       coordinate,
-      date
+      date,
+      assignee
     },
     { new: true }
-  );
+  )
+  .populate([
+    { path: 'account' },
+    { path: 'assignee', select: 'name phone' }
+  ])
+  .exec();
 }
 
 export async function cancel(pickupId) {

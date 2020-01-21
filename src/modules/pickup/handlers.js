@@ -51,6 +51,7 @@ export async function update(request, response, next) {
     coordinate,
     status,
     type,
+    assignee,
   } = request.body;
 
   let pickup = null;
@@ -63,6 +64,7 @@ export async function update(request, response, next) {
       date,
       address,
       coordinate,
+      assignee,
     });
   } catch (error) {
     if (error instanceof EntityNotFound) {

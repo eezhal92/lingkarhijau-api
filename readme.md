@@ -16,3 +16,5 @@
 [ ] Snapshotting
 [ ] Use DDD ?
 [ ] Lint / Husky / Prettier
+
+[ ] Remove systemRoles, accounts, email etc of populated user from response to prevent data leak

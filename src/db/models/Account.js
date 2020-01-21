@@ -14,6 +14,7 @@ const AccountSchema = Schema({
     type: String,
     enum: [
       'ORGANIZATION_COMPANY',
+      'ORGANIZATION_SCHOOL',
       'ORGANIZATION_SME',
       'ORGANIZATION_GOVERNMENT',
       'MEMBER',
