@@ -21,7 +21,6 @@ router.post(
     phone: 'required|min:8',
     email: 'required|email',
     password: 'required|min:8',
-    address: 'required',
     account: {
       type: 'required|in:MEMBER,ORGANIZATION',
       subType: 'required|in:ORGANIZATION_COMPANY,ORGANIZATION_SME,ORGANIZATION_GOVERNMENT,MEMBER',
