@@ -6,7 +6,7 @@ const router = Router();
 router.get('/', handlers.getProducts);
 router.get('/:id', handlers.getProduct);
 router.post('/', handlers.createProduct);
-router.put('/:id', handlers.createProduct);
+router.put('/:id', handlers.updateProduct);
 router.delete('/:id', handlers.removeProduct);
 
 export default router;
