@@ -41,3 +41,44 @@ export function findCart(payload) {
   return Cart.findOne({ user: userId })
     .populate('items.product');
 }
+
+/**
+ * @param {object} payload
+ * @param {string} payload.cartId
+ * @param {string} payload.productId
+ * @param {number} payload.qty
+ */
+export async function updateItemQty(payload) {
+  const { cartId, productId, qty } = payload;
+  const cart = await Cart.findById(cartId);
+
+  if (!cart) throw new Error('Not found');
+  const isRemove = Number(qty) === 0;
+
+  if (isRemove) {
+    return Cart.updateOne({ _id: cartId }, {
+      $pull: { product: productId },
+    });
+  }
+
+  return Cart.updateOne({ _id: cartId, 'items.product': productId }, {
+    $set: { 'items.$.qty': qty }
+  });
+}
+
+/**
+ * @param {object} payload
+ * @param {string} payload.cartId
+ * @param {string} payload.productId
+ * @param {number} payload.qty
+ */
+export async function addItem(payload) {
+  const { cartId, productId, qty } = payload;
+  const cart = await Cart.findById(cartId);
+
+  if (!cart) throw new Error('Not found');
+
+  return Cart.updateOne({ _id: cartId }, {
+    $push: { items: { product: productId, qty } },
+  });
+}
