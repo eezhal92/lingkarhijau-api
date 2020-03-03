@@ -21,6 +21,7 @@ function createProduct(request, response, next) {
     images = [],
     categories = [],
     tags = [],
+    category,
   } = request.body;
 
   productService.createProduct({
@@ -30,6 +31,7 @@ function createProduct(request, response, next) {
     images,
     categories,
     tags,
+    category,
   })
     .then((product) => response.json({ product }))
     .catch(next);

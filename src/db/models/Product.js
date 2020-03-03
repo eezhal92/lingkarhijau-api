@@ -5,7 +5,7 @@ const ProductSchema = Schema({
   title: { type: String, required: true },
   slug: { type: String, required: true, index: true },
   price: { type: Number, required: true },
-  categories: [{ type: Schema.Types.ObjectId, ref: 'ProductCategory' }],
+  category: { type: Schema.Types.ObjectId, ref: 'ProductCategory' },
   tags: [{ type: Schema.Types.ObjectId, ref: 'ProductTag' }],
   description: { type: String, required: true },
   images: { type: Array, required: true },

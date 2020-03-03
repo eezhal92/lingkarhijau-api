@@ -1,5 +1,10 @@
+import * as categoryService from '../../services/category';
+
 function getCategories(request, response) {
-  response.json({ categories: [] });
+  categoryService.getCategories()
+    .then((categories) => {
+      response.json({ categories });
+    });
 }
 
 function getCategory(request, response) {
@@ -7,7 +12,10 @@ function getCategory(request, response) {
 }
 
 function createCategory(request, response) {
-  response.json({ title: 'My Category' });
+  categoryService.createCategory(request.body.name)
+    .then((category) => {
+      response.json({ category });
+    });
 }
 
 function updateCategory(request, response) {

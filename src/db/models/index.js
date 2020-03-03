@@ -6,3 +6,5 @@ export { default as Account } from './Account';
 export { default as AccountBalance } from './AccountBalance';
 export { default as Product } from './Product';
 export { default as Cart } from './Cart';
+export { default as ProductCategory } from './ProductCategory';
+export { default as ShopOrder } from './ShopOrder';
