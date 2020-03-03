@@ -31,6 +31,18 @@ function getCart(request, response) {
     });
 }
 
+function removeCartItem(request, response) {
+  const { id: cartId, productId } = request.params;
+
+  cartService.removeItem({
+    cartId,
+    productId,
+  })
+    .then(() => {
+      response.json({ message: 'Success' });
+    });
+}
+
 function removeCart(request, response) {
   response.json({ message: 'Success' });
 }
@@ -68,4 +80,5 @@ export default {
   removeCart,
   updateItemQty,
   addItem,
+  removeCartItem,
 };

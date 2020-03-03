@@ -46,5 +46,6 @@ router.put(
   handlers.updateItemQty
 );
 router.delete('/:id', handlers.removeCart);
+router.delete('/:id/items/:productId', handlers.removeCartItem);
 
 export default router;

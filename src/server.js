@@ -1,7 +1,6 @@
 import cors from 'cors';
 import express from 'express';
 import bodyParser from 'body-parser';
-
 import { UnprocessableEntityError, HTTPError } from './lib/errors';
 
 export default function createServer({ routes }) {

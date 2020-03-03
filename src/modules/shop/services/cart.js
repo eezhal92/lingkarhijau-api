@@ -82,3 +82,19 @@ export async function addItem(payload) {
     $push: { items: { product: productId, qty } },
   });
 }
+
+/**
+ * @param {object} payload
+ * @param {string} payload.cartId
+ * @param {string} payload.productId
+ */
+export async function removeItem(payload) {
+  const { cartId, productId } = payload;
+  const cart = await Cart.findById(cartId);
+
+  if (!cart) throw new Error('Not found');
+
+  return Cart.updateOne({ _id: cartId }, {
+    $pull: { items: { product: productId } },
+  });
+}
