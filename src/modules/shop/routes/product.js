@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { product as handlers } from './handlers';
 import { createShouldValidated } from '../../../middlewares/input-validation';
+
 const router = Router();
 
 router.get('/', handlers.getProducts);
