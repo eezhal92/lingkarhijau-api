@@ -11,6 +11,7 @@ router.post('/',
     title: 'required|min:2',
     description: 'required',
     price: 'required|min:0',
+    stock: 'numeric',
   }),
   handlers.createProduct
 );

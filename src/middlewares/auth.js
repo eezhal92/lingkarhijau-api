@@ -60,7 +60,7 @@ export function attachUserToRequest(request, response, next) {
 
 export function shouldAuthenticated(request, response, next) {
   if (!request.headers['authorization']) {
-    return next(new Error('You are not authenticated'));
+    return response.status(401).json({ message: 'You are not authenticated' });
   }
 
   const [, token] = request.headers['authorization'].split('Bearer ');
@@ -74,7 +74,7 @@ export function shouldAuthenticated(request, response, next) {
   }
 
   if (result.errorCode === AUTH_ERROR_CODES.UNAUTHENTICATED) {
-    return next(new Error('You are not authenticated'));
+    return response.status(401).json({ message: 'You are not authenticated' });
   }
 
   return next(result.error);

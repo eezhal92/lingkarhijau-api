@@ -9,6 +9,7 @@ const ProductSchema = Schema({
   tags: [{ type: Schema.Types.ObjectId, ref: 'ProductTag' }],
   description: { type: String, required: true },
   images: { type: Array, required: true },
+  stock: { type: Number, default: 0 },
   visible: { type: Boolean, default: false },
   archived: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
