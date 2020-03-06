@@ -12,6 +12,7 @@ router.post('/',
     description: 'required',
     price: 'required|min:0',
     stock: 'numeric',
+    unit: 'required|in:pcs,gram,kg,pack',
   }),
   handlers.createProduct
 );

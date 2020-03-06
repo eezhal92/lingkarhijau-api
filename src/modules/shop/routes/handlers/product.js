@@ -1,8 +1,13 @@
 import * as productService from '../../services/product';
 
 async function getProducts(request, response) {
-  const products = await productService.findProducts();
-  response.json({ products });
+  const data = await productService.findProducts({
+    category: request.query.category,
+    search: request.query.search,
+    page: request.query.page,
+    limit: request.query.limit,
+  });
+  response.json(data);
 }
 
 async function getProduct(request, response) {
@@ -21,6 +26,8 @@ function createProduct(request, response, next) {
     images = [],
     categories = [],
     tags = [],
+    unit,
+    stock,
     category,
   } = request.body;
 
@@ -31,6 +38,8 @@ function createProduct(request, response, next) {
     images,
     categories,
     tags,
+    unit,
+    stock,
     category,
   })
     .then((product) => response.json({ product }))

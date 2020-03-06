@@ -16,7 +16,7 @@ const UserSchema = Schema({
       account: { type: Schema.Types.ObjectId, ref: 'Account' },
       roles: [{ type: Schema.Types.ObjectId, ref: 'AccountRole' }],
     }
-  ]
+  ],
 });
 
 export default model('User', UserSchema);

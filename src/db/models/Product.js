@@ -10,6 +10,7 @@ const ProductSchema = Schema({
   description: { type: String, required: true },
   images: { type: Array, required: true },
   stock: { type: Number, default: 0 },
+  unit: { type: String, required: true, enum: ['pcs', 'gram', 'kg', 'pack'] },
   visible: { type: Boolean, default: false },
   archived: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },

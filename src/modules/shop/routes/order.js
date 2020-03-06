@@ -17,6 +17,9 @@ router.post('/',
       address: 'required',
       date: 'required|date',
       city: 'required',
+    },
+    payment: {
+      method: 'required|in:transfer,gopay'
     }
   }),
   attachUserToRequest,

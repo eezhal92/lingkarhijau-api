@@ -1,5 +1,5 @@
 import { addHours } from 'date-fns';
-import { ShopOrder, Cart } from '../../../db/models';
+import { Product, ShopOrder, Cart } from '../../../db/models';
 
 function getOrderID() {
   // todo: real implementatino
@@ -10,6 +10,14 @@ function getTotalOfCart(cart) {
   return cart.items.reduce((acc, item) => {
     return acc + (item.product.price * item.qty);
   }, 0);
+}
+
+/**
+ * @param  {object} cart
+ * @return {string[]}
+ */
+function getProductIds(cart) {
+  return cart.items.map(item => item.product._id);
 }
 
 /**
@@ -26,6 +34,7 @@ function getTotalOfCart(cart) {
  * @param {string}   payload.shipment.city
  * @param {string?}  payload.shipment.zipCode
  * @param {string?}  payload.shipment.coordinate
+ * @param {string?}  payload.payment.method
  * @param {string?}  payload.notes
  */
 export async function createOrder(payload) {
@@ -36,24 +45,32 @@ export async function createOrder(payload) {
 
   const paymentDeadline = addHours(new Date(), 4);
   const total = getTotalOfCart(cart);
-  const order = Object.assign(rest, {
+  const data = Object.assign(rest, {
     items: cart.toJSON().items,
     payment: {
+      method: rest.payment.method,
       total,
       confirmationDeadline: paymentDeadline,
     },
   });
 
-  console.log(order);
-
   // create order
   // todo: add short order id
   // todo: wrap it in mongodb trx
-  // await ShopOrder.create(order);
-  // await cart.remove();
+  const order = await ShopOrder.create(data);
+
+  // deduct stock
+  const productIds = getProductIds(cart);
+  const products = await Product.find({ _id: { $in: productIds }});
+
+  products.forEach((product) => {
+    const item = cart.items.find(item => item.product._id.toString() === product._id.toString());
+    product.update({ stock: product.stock - item.qty }).exec();
+  });
+
+  await cart.remove();
 
   // todo: send notification by email or wa/sms
-
   // todo: the boolean value could be different
   // todo: when using midtrans
   // todo: it could be used to determine user's message
@@ -61,6 +78,6 @@ export async function createOrder(payload) {
     needPaymentConfirmation: true,
     total,
     paymentDeadline,
-    orderId: getOrderID(),
+    orderId: order._id,
   };
 }
