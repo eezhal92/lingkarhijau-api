@@ -1,10 +1,11 @@
 import * as categoryService from '../../services/category';
 
-function getCategories(request, response) {
+function getCategories(request, response, next) {
   categoryService.getCategories()
     .then((categories) => {
       response.json({ categories });
-    });
+    })
+    .catch(next);
 }
 
 function getCategory(request, response) {

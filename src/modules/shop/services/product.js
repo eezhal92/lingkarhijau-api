@@ -30,7 +30,7 @@ function createFindQuery(payload) {
 export function findProducts(payload) {
   const { page = 1, limit = 16 } = payload;
   const query = createFindQuery(payload);
-  console.log({ query });
+
   return Product.paginate(query, {
     page,
     limit,

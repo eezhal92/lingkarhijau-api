@@ -39,7 +39,13 @@ function getProductIds(cart) {
  */
 export async function createOrder(payload) {
   const { cartId, ...rest } = payload;
-  const cart = await Cart.findById(cartId).populate('items.product').exec();
+  let cart;
+
+  try {
+    cart = await Cart.findById(cartId).populate('items.product').exec();
+  } catch (err) {
+    throw err;
+  }
 
   if (!cart) throw new Error('Cart not found');
 
@@ -57,18 +63,23 @@ export async function createOrder(payload) {
   // create order
   // todo: add short order id
   // todo: wrap it in mongodb trx
-  const order = await ShopOrder.create(data);
+  let order;
 
-  // deduct stock
-  const productIds = getProductIds(cart);
-  const products = await Product.find({ _id: { $in: productIds }});
+  try {
+    order = await ShopOrder.create(data);
+    // deduct stock
+    const productIds = getProductIds(cart);
+    const products = await Product.find({ _id: { $in: productIds }});
 
-  products.forEach((product) => {
-    const item = cart.items.find(item => item.product._id.toString() === product._id.toString());
-    product.update({ stock: product.stock - item.qty }).exec();
-  });
+    products.forEach((product) => {
+      const item = cart.items.find(item => item.product._id.toString() === product._id.toString());
+      product.update({ stock: product.stock - item.qty }).exec();
+    });
 
-  await cart.remove();
+    await cart.remove();
+  } catch (err) {
+    throw err;
+  }
 
   // todo: send notification by email or wa/sms
   // todo: the boolean value could be different
