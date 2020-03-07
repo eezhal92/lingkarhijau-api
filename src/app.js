@@ -22,7 +22,10 @@ export default function createApp(cradle) {
         .then(db.connect)
         .then(initEventStore)
         .then(registerHandlers)
-        .then(server.start);
+        .then(server.start)
+        .then(() => {
+          console.log(`Running in ${process.env.NODE_ENV} mode`);
+        });
     }
   }
 }

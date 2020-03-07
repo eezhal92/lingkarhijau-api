@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "start": "NODE_ENV=production node -r esm index.js",
     "dev": "nodemon --exec \"node -r esm index.js\""
   },
   "keywords": [],
