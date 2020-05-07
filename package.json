@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@sentry/node": "5.15.5",
     "awilix": "^4.2.2",
     "bcrypt": "^3.0.6",
     "bluebird": "^3.5.5",

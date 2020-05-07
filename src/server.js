@@ -2,9 +2,13 @@ import cors from 'cors';
 import express from 'express';
 import bodyParser from 'body-parser';
 import { UnprocessableEntityError, HTTPError } from './lib/errors';
+import * as Sentry from '@sentry/node';
 
 export default function createServer({ routes }) {
   const app = express();
+
+  Sentry.init({ dsn: process.env.SENTRY_DSN });
+  app.use(Sentry.Handlers.requestHandler());
 
   app.use(cors({
     origin: '*',
@@ -15,6 +19,8 @@ export default function createServer({ routes }) {
   }));
 
   app.use('/api', routes);
+
+  app.use(Sentry.Handlers.errorHandler());
 
   app.use((error, request, response, next) => {
     if (error instanceof HTTPError) {
