@@ -39,6 +39,15 @@ const ShopOrderSchema = Schema({
     method: { type: String, required: true, enum: ['gopay', 'transfer'] },
     total: Number,
   },
+  cancellation: {
+    note: String,
+    actor: { type: Schema.Types.ObjectId, ref: 'user' },
+  },
+  channel: { type: String, enum: ['online', 'offline'], default: 'online' },
+  /**
+   * handler yang menerima pesanan secara offline
+   */
+  handler: { type: Schema.Types.ObjectId, ref: 'user' },
   notes: String,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

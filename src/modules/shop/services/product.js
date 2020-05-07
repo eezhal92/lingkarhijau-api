@@ -6,7 +6,6 @@ function createFindQuery(payload) {
   const { search, category } = payload;
   const query = {
     archived: false,
-    visible: false,
   };
 
   if (category && category !== 'all') {

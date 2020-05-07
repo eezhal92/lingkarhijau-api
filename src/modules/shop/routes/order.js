@@ -5,6 +5,8 @@ import { createShouldValidated } from '../../../middlewares/input-validation';
 
 const router = Router();
 
+// todo: add admin middleware
+router.get('/', handlers.getOrders);
 router.post('/',
   createShouldValidated({
     cartId: 'required',

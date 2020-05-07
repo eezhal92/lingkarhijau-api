@@ -1,11 +1,6 @@
 import { addHours } from 'date-fns';
 import { Product, ShopOrder, Cart } from '../../../db/models';
 
-function getOrderID() {
-  // todo: real implementatino
-  return Date.now();
-}
-
 function getTotalOfCart(cart) {
   return cart.items.reduce((acc, item) => {
     return acc + (item.product.price * item.qty);
@@ -91,4 +86,18 @@ export async function createOrder(payload) {
     paymentDeadline,
     orderId: order._id,
   };
+}
+
+export function getOrders(payload = {}) {
+  const { page = 1, limit = 10 } = payload;
+
+  return ShopOrder.paginate({}, {
+    page,
+    limit,
+    customLabels: {
+      docs: 'orders',
+      totalDocs: 'total'
+    },
+    sort: { createdAt: -1 }
+  });
 }

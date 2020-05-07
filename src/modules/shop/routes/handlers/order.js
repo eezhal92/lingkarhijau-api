@@ -15,6 +15,13 @@ function createOrder(request, response, next) {
     .catch(next);
 }
 
+function getOrders(request, response, next) {
+  return orderService.getOrders({ page: request.query.page })
+    .then((data) => response.json(data))
+    .catch(next);
+}
+
 export default {
   createOrder,
+  getOrders,
 };

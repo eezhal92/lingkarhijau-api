@@ -6,6 +6,7 @@ import { Router } from 'express';
 import { routes as authRoutes } from './modules/auth';
 import { routes as accountRoutes } from './modules/account';
 import { routes as pickupRoutes } from './modules/pickup';
+import { routes as userRoutes } from './modules/user';
 import { productRoutes, categoryRoutes, cartRoutes, orderRoutes } from './modules/shop';
 
 import { createRoute as createTransactionRoutes } from './modules/transaction/http/routes';
@@ -21,6 +22,7 @@ export default function createRoutes(cradle) {
   router.use('/categories', categoryRoutes);
   router.use('/carts', cartRoutes);
   router.use('/orders', orderRoutes);
+  router.use('/users', userRoutes);
 
   router.use('/trash-pricings', createTrashPricingRoutes(cradle))
   router.use('/transactions', createTransactionRoutes(cradle))
